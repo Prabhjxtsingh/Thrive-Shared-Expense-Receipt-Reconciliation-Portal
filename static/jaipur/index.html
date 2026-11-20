@@ -86,9 +86,9 @@
         <button type="button" data-nav="fund"><span class="nav-icon"><svg class="icon"><use href="#i-wallet"/></svg></span><span class="nav-label">Trip fund</span></button>
         <button type="button" data-nav="members"><span class="nav-icon"><svg class="icon"><use href="#i-members"/></svg></span><span class="nav-label">Members</span></button>
         <button type="button" data-nav="ai-guide"><span class="nav-icon"><svg class="icon"><use href="#i-sparkle"/></svg></span><span class="nav-label">AI-900 & Guide</span></button>
+        <button type="button" data-nav="settings" class="settings-nav-button"><span class="nav-icon"><svg class="icon"><use href="#i-settings"/></svg></span><span class="nav-label">Settings</span></button>
       </nav>
       <div class="sidebar-bottom nav-list">
-        <button type="button" data-nav="settings" class="settings-nav-button"><span class="nav-icon"><svg class="icon"><use href="#i-settings"/></svg></span><span class="nav-label">Settings</span></button>
         <button type="button" data-action="logout"><span class="nav-icon"><svg class="icon"><use href="#i-logout"/></svg></span><span class="nav-label">Log out</span></button>
       </div>
     </aside>
@@ -247,6 +247,433 @@
         </aside>
       </div>
       </div><!-- End #view-overview -->
+
+      <div class="view-panel" id="view-expenses" hidden>
+        <div class="panel-page-header">
+          <div>
+            <h1 class="page-title">All Expenses</h1>
+            <p class="page-subtitle">Complete ledger of logged industrial visit bills, item split allocations, and review status.</p>
+          </div>
+          <div class="page-header-actions">
+            <button type="button" class="pill-button add-expense" data-action="add-expense"><svg class="icon"><use href="#i-plus"/></svg> Add expense</button>
+            <button type="button" class="pill-button secondary-button" data-action="back-to-overview">
+              <svg class="icon"><use href="#i-overview"/></svg> Back to Overview
+            </button>
+          </div>
+        </div>
+
+        <div class="fund-summary-banner">
+          <div class="fund-metric-box">
+            <p>Total Group Spend</p>
+            <strong>₹4,490.00</strong>
+          </div>
+          <div class="fund-metric-box">
+            <p>Reconciled &amp; Settled</p>
+            <strong style="color: #8de2bc;">₹3,650.00</strong>
+          </div>
+          <div class="fund-metric-box">
+            <p>Pending Review</p>
+            <strong style="color: #ffcf87;">₹840.00</strong>
+          </div>
+        </div>
+
+        <div class="settings-card" style="margin-bottom: 20px;">
+          <div class="group-toolbar" style="margin-top: 0; padding-bottom: 14px; border-bottom: 1px solid var(--line);">
+            <div class="filters" role="group" aria-label="Filter expenses">
+              <span class="azure-badge" style="background: #111a32; color: #8eaaff; border-color: #2b3e6c;"><span class="filter-dot all-dot"></span>All expenses (3)</span>
+              <span class="azure-badge" style="background: #111a32; color: #ffcf87; border-color: #2b3e6c;"><span class="filter-dot review-dot"></span>1 Needs review</span>
+              <span class="azure-badge" style="background: #111a32; color: #8de2bc; border-color: #2b3e6c;"><span class="filter-dot settled-dot"></span>2 Settled</span>
+            </div>
+            <button type="button" class="round-button" data-action="expenses-search" aria-label="Search expenses"><svg class="icon"><use href="#i-search"/></svg></button>
+          </div>
+
+          <div style="display: grid; gap: 10px; margin-top: 14px;">
+            <article class="expense-item-card" data-expense="dinner" data-status="review" data-amount="840" data-merchant="The Campus Kitchen" data-category="Food">
+              <div class="expense-row-top"><span class="expense-meta"><span class="filter-dot all-dot"></span><time datetime="2026-11-17">17 Nov</time><span>·</span> Food</span><span class="status status-review"><span></span>Needs review</span></div>
+              <div class="expense-main">
+                <span class="expense-symbol symbol-dinner"><svg class="icon"><use href="#i-food"/></svg></span>
+                <div class="expense-title"><h3>Group dinner</h3><p>The Campus Kitchen · Margherita pizza, Punjabi thali, Drinks</p></div>
+                <strong class="expense-amount amount">₹840.00</strong>
+              </div>
+              <div class="expense-tail"><span><svg class="icon"><use href="#i-wallet"/></svg>Paid by Aman &amp; Simran</span><span class="expense-people">3 members</span></div>
+              <div class="expense-selected-details"><p><span class="amount">₹40 difference</span> between extracted item sum (₹800) and bill total (₹840)</p><button class="pill-button review-expense" type="button" data-action="review" data-receipt="dinner"><svg class="icon"><use href="#i-receipt"/></svg>Review receipt</button></div>
+            </article>
+
+            <article class="expense-item-card" data-expense="transport" data-status="settled" data-amount="3200" data-merchant="Jaipur City Coaches" data-category="Transport">
+              <div class="expense-row-top"><span class="expense-meta"><span class="filter-dot settled-dot"></span><time datetime="2026-11-16">16 Nov</time><span>·</span> Transport</span><span class="status status-settled"><svg class="icon"><use href="#i-check"/></svg>Settled</span></div>
+              <div class="expense-main">
+                <span class="expense-symbol symbol-transport"><svg class="icon"><use href="#i-bus"/></svg></span>
+                <div class="expense-title"><h3>Transport booking</h3><p>Coach transfer for college industrial visit</p></div>
+                <strong class="expense-amount amount">₹3,200.00</strong>
+              </div>
+              <div class="expense-tail"><span><svg class="icon"><use href="#i-wallet"/></svg>Paid from Trip Fund Advance</span><span class="expense-people">3 members</span></div>
+              <div class="expense-selected-details"><p>Disbursed from pooled group advances.</p><button class="pill-button secondary-button" type="button" data-action="review" data-receipt="transport">View expense</button></div>
+            </article>
+
+            <article class="expense-item-card" data-expense="refreshments" data-status="settled" data-amount="450" data-merchant="Station Café" data-category="Food">
+              <div class="expense-row-top"><span class="expense-meta"><span class="filter-dot settled-dot"></span><time datetime="2026-11-18">18 Nov</time><span>·</span> Food</span><span class="status status-settled"><svg class="icon"><use href="#i-check"/></svg>Settled</span></div>
+              <div class="expense-main">
+                <span class="expense-symbol symbol-refreshments"><svg class="icon"><use href="#i-cup"/></svg></span>
+                <div class="expense-title"><h3>Refreshments</h3><p>Tea and snacks on return trip</p></div>
+                <strong class="expense-amount amount">₹450.00</strong>
+              </div>
+              <div class="expense-tail"><span><svg class="icon"><use href="#i-wallet"/></svg>Paid by Karan</span><span class="expense-people">3 members</span></div>
+              <div class="expense-selected-details"><p>Split equally among 3 members (₹150.00 each).</p><button class="pill-button secondary-button" type="button" data-action="review" data-receipt="refreshments">View expense</button></div>
+            </article>
+          </div>
+        </div>
+      </div>
+
+      <div class="view-panel" id="view-receipts" hidden>
+        <div class="panel-page-header">
+          <div>
+            <h1 class="page-title">Receipts &amp; Document Intelligence</h1>
+            <p class="page-subtitle">Paper bills parsed with Azure AI Document Intelligence prebuilt-receipt foundation model.</p>
+          </div>
+          <div class="page-header-actions">
+            <button type="button" class="pill-button add-expense" data-action="upload-receipt"><svg class="icon"><use href="#i-upload"/></svg> Upload receipt</button>
+            <button type="button" class="pill-button secondary-button" data-action="back-to-overview">
+              <svg class="icon"><use href="#i-overview"/></svg> Back to Overview
+            </button>
+          </div>
+        </div>
+
+        <div class="receipts-view-grid">
+          <div class="receipt-scan-card" style="border-color: #e59740;">
+            <div class="receipt-scan-card-head">
+              <div>
+                <span class="azure-badge"><svg class="icon" style="width: 13px; height: 13px;"><use href="#i-cpu"/></svg> Azure AI prebuilt-receipt</span>
+                <h3 style="font-size: 1.15rem; margin: 8px 0 2px; color: #fff;">The Campus Kitchen</h3>
+                <small style="color: #9cb1d7;">17 Nov 2026 · Invoice BILL 026</small>
+              </div>
+              <span class="status status-review"><span></span>Needs review</span>
+            </div>
+            <div style="background: #111a30; border-radius: 10px; padding: 12px; font-size: .83rem; color: #b2c3e4;">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 4px;"><span>Extracted Total:</span><strong style="color: #fff;">₹840.00</strong></div>
+              <div style="display: flex; justify-content: space-between; margin-bottom: 4px;"><span>Item Subtotal:</span><span>₹800.00</span></div>
+              <div style="display: flex; justify-content: space-between; color: #ffb19f;"><span>Unaccounted Difference:</span><strong>₹40.00 (Tax/Adjustment)</strong></div>
+              <div style="display: flex; justify-content: space-between; margin-top: 4px; font-size: .75rem; color: #8bb3ff;"><span>OCR Confidence:</span><span>98.7%</span></div>
+            </div>
+            <p style="font-size: .80rem; color: #a4b6d8; line-height: 1.4;">3 items detected: Margherita pizza (₹400), Punjabi thali (₹250), Drinks (₹150). Difference requires human reviewer reconciliation before posting.</p>
+            <button class="pill-button review-expense" type="button" data-action="review" data-receipt="dinner" style="width: 100%;"><svg class="icon"><use href="#i-receipt"/></svg> Review and Reconcile</button>
+          </div>
+
+          <div class="receipt-scan-card">
+            <div class="receipt-scan-card-head">
+              <div>
+                <span class="azure-badge"><svg class="icon" style="width: 13px; height: 13px;"><use href="#i-cpu"/></svg> Azure AI prebuilt-receipt</span>
+                <h3 style="font-size: 1.15rem; margin: 8px 0 2px; color: #fff;">Jaipur City Coaches</h3>
+                <small style="color: #9cb1d7;">16 Nov 2026 · Invoice JCC-8821</small>
+              </div>
+              <span class="status status-settled"><svg class="icon"><use href="#i-check"/></svg>Settled</span>
+            </div>
+            <div style="background: #111a30; border-radius: 10px; padding: 12px; font-size: .83rem; color: #b2c3e4;">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 4px;"><span>Extracted Total:</span><strong style="color: #fff;">₹3,200.00</strong></div>
+              <div style="display: flex; justify-content: space-between; margin-bottom: 4px;"><span>Payment Source:</span><span>Trip Advance Fund</span></div>
+              <div style="display: flex; justify-content: space-between; color: #8de2bc;"><span>Reconciliation Status:</span><strong>₹0.00 Variance</strong></div>
+              <div style="display: flex; justify-content: space-between; margin-top: 4px; font-size: .75rem; color: #8bb3ff;"><span>OCR Confidence:</span><span>99.4%</span></div>
+            </div>
+            <p style="font-size: .80rem; color: #a4b6d8; line-height: 1.4;">Coach hire voucher verified. Arithmetic balanced with 3-way equal allocation across trip participants.</p>
+            <button class="pill-button secondary-button" type="button" data-action="review" data-receipt="transport" style="width: 100%;">View Verified Bill</button>
+          </div>
+
+          <div class="receipt-scan-card">
+            <div class="receipt-scan-card-head">
+              <div>
+                <span class="azure-badge"><svg class="icon" style="width: 13px; height: 13px;"><use href="#i-cpu"/></svg> Azure AI prebuilt-receipt</span>
+                <h3 style="font-size: 1.15rem; margin: 8px 0 2px; color: #fff;">Station Café</h3>
+                <small style="color: #9cb1d7;">18 Nov 2026 · Bill SC-1044</small>
+              </div>
+              <span class="status status-settled"><svg class="icon"><use href="#i-check"/></svg>Settled</span>
+            </div>
+            <div style="background: #111a30; border-radius: 10px; padding: 12px; font-size: .83rem; color: #b2c3e4;">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 4px;"><span>Extracted Total:</span><strong style="color: #fff;">₹450.00</strong></div>
+              <div style="display: flex; justify-content: space-between; margin-bottom: 4px;"><span>Payer:</span><span>Karan Verma (Cash)</span></div>
+              <div style="display: flex; justify-content: space-between; color: #8de2bc;"><span>Reconciliation Status:</span><strong>₹0.00 Variance</strong></div>
+              <div style="display: flex; justify-content: space-between; margin-top: 4px; font-size: .75rem; color: #8bb3ff;"><span>OCR Confidence:</span><span>99.1%</span></div>
+            </div>
+            <p style="font-size: .80rem; color: #a4b6d8; line-height: 1.4;">Refreshments bill verified. Distributed equally (₹150.00 each) and credited to Karan's ledger position.</p>
+            <button class="pill-button secondary-button" type="button" data-action="review" data-receipt="refreshments" style="width: 100%;">View Verified Bill</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="view-panel" id="view-balances" hidden>
+        <div class="panel-page-header">
+          <div>
+            <h1 class="page-title">Balances &amp; Bilateral Settlements</h1>
+            <p class="page-subtitle">Real-time net balances derived from posted expenses, proportional taxes, and payments.</p>
+          </div>
+          <div class="page-header-actions">
+            <button type="button" class="pill-button secondary-button" data-action="back-to-overview">
+              <svg class="icon"><use href="#i-overview"/></svg> Back to Overview
+            </button>
+          </div>
+        </div>
+
+        <div class="fund-summary-banner" style="grid-template-columns: 1fr;">
+          <div class="fund-metric-box" style="border-color: #3b5f9e; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+            <div>
+              <p>Group Net Balance Invariant</p>
+              <strong style="color: #8de2bc; font-size: 1.4rem;">₹0.00 Net Variance</strong>
+              <small style="display: block; color: #a2b4d6; margin-top: 2px;">Total Debts exactly equal Total Credits (Zero-Drift Guarantee)</small>
+            </div>
+            <span class="azure-badge" style="background: #194435; color: #8de2bc; border-color: #2b6a53; font-size: .78rem; padding: 6px 12px;">
+              <svg class="icon" style="width: 15px; height: 15px;"><use href="#i-shield-check"/></svg> Double-Entry Verified
+            </span>
+          </div>
+        </div>
+
+        <div class="balances-grid">
+          <div class="balance-card-item">
+            <div class="balance-card-head">
+              <div class="balance-user-info">
+                <span class="avatar avatar-aman" style="width: 38px; height: 38px; font-size: 1rem;">A</span>
+                <div>
+                  <strong style="color: #fff; font-size: 1rem;">Aman Sharma</strong>
+                  <small style="display: block; color: #8eaaff;">Trip Organizer</small>
+                </div>
+              </div>
+              <span class="balance-badge badge-creditor">To receive</span>
+            </div>
+            <div class="balance-metric">
+              <span class="balance-metric-label">Net Balance</span>
+              <strong class="balance-amount-positive">+₹577.50</strong>
+            </div>
+            <div class="balance-sub-details">
+              <div><span>Total Paid:</span><strong>₹840.00</strong></div>
+              <div><span>Consumed Share:</span><strong>₹262.50</strong></div>
+            </div>
+            <p style="font-size: .78rem; color: #a4b6d8;">Aman paid ₹840 upfront for the Campus Kitchen group dinner. After consuming ₹262.50, he has ₹577.50 to receive.</p>
+          </div>
+
+          <div class="balance-card-item">
+            <div class="balance-card-head">
+              <div class="balance-user-info">
+                <span class="avatar avatar-simran" style="width: 38px; height: 38px; font-size: 1rem;">S</span>
+                <div>
+                  <strong style="color: #fff; font-size: 1rem;">Simran Kaur</strong>
+                  <small style="display: block; color: #8eaaff;">Member</small>
+                </div>
+              </div>
+              <span class="balance-badge badge-debtor">To pay</span>
+            </div>
+            <div class="balance-metric">
+              <span class="balance-metric-label">Net Balance</span>
+              <strong class="balance-amount-negative">-₹262.50</strong>
+            </div>
+            <div class="balance-sub-details">
+              <div><span>Total Paid:</span><strong>₹0.00</strong></div>
+              <div><span>Consumed Share:</span><strong>₹262.50</strong></div>
+            </div>
+            <p style="font-size: .78rem; color: #a4b6d8;">Simran shared pizza and drinks at dinner (₹250 items + ₹12.50 proportional GST). Owes ₹262.50 to Aman.</p>
+          </div>
+
+          <div class="balance-card-item">
+            <div class="balance-card-head">
+              <div class="balance-user-info">
+                <span class="avatar avatar-karan" style="width: 38px; height: 38px; font-size: 1rem;">K</span>
+                <div>
+                  <strong style="color: #fff; font-size: 1rem;">Karan Verma</strong>
+                  <small style="display: block; color: #8eaaff;">Member</small>
+                </div>
+              </div>
+              <span class="balance-badge badge-debtor">To pay</span>
+            </div>
+            <div class="balance-metric">
+              <span class="balance-metric-label">Net Balance</span>
+              <strong class="balance-amount-negative">-₹315.00</strong>
+            </div>
+            <div class="balance-sub-details">
+              <div><span>Total Paid:</span><strong>₹450.00</strong></div>
+              <div><span>Consumed Share:</span><strong>₹765.00</strong></div>
+            </div>
+            <p style="font-size: .78rem; color: #a4b6d8;">Karan paid ₹450 for snacks and consumed ₹315 dinner + ₹150 snacks. Net balance is ₹315.00 owed to Aman.</p>
+          </div>
+        </div>
+
+        <div class="settlement-plan-box">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 8px;">
+            <div>
+              <h3 style="font-size: 1.15rem; color: #fff; margin: 0 0 3px;">Suggested Bilateral Settlements</h3>
+              <p style="font-size: .83rem; color: #a4b6d8; margin: 0;">Simplified transaction plan: 2 direct transfers clear all group debt completely.</p>
+            </div>
+            <span class="azure-badge"><svg class="icon" style="width: 14px; height: 14px;"><use href="#i-check"/></svg> Minimal Transfer Optimization</span>
+          </div>
+
+          <div class="settlement-step-row">
+            <div class="settlement-step-info">
+              <span class="avatar avatar-simran">S</span>
+              <div><strong style="color: #fff;">Simran Kaur</strong><small style="display:block; color:#ff9d87;">Sender (Debtor)</small></div>
+              <span class="settle-arrow">➔</span>
+              <span class="avatar avatar-aman">A</span>
+              <div><strong style="color: #fff;">Aman Sharma</strong><small style="display:block; color:#8de2bc;">Recipient (Creditor)</small></div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 14px;">
+              <strong style="font-size: 1.25rem; color: #ffcf87;">₹262.50</strong>
+              <button type="button" class="pill-button add-expense" data-action="settle-simran" style="min-height: 32px; padding: 0 12px; font-size: .78rem;">Record Settlement</button>
+            </div>
+          </div>
+
+          <div class="settlement-step-row">
+            <div class="settlement-step-info">
+              <span class="avatar avatar-karan">K</span>
+              <div><strong style="color: #fff;">Karan Verma</strong><small style="display:block; color:#ff9d87;">Sender (Debtor)</small></div>
+              <span class="settle-arrow">➔</span>
+              <span class="avatar avatar-aman">A</span>
+              <div><strong style="color: #fff;">Aman Sharma</strong><small style="display:block; color:#8de2bc;">Recipient (Creditor)</small></div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 14px;">
+              <strong style="font-size: 1.25rem; color: #ffcf87;">₹315.00</strong>
+              <button type="button" class="pill-button add-expense" data-action="settle-karan" style="min-height: 32px; padding: 0 12px; font-size: .78rem;">Record Settlement</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="view-panel" id="view-fund" hidden>
+        <div class="panel-page-header">
+          <div>
+            <h1 class="page-title">Trip Advance Fund</h1>
+            <p class="page-subtitle">Pooled funds collected in advance from students for group bookings and industrial visit logistics.</p>
+          </div>
+          <div class="page-header-actions">
+            <button type="button" class="pill-button add-expense" data-action="fund-contribute"><svg class="icon"><use href="#i-plus"/></svg> Record Contribution</button>
+            <button type="button" class="pill-button secondary-button" data-action="back-to-overview">
+              <svg class="icon"><use href="#i-overview"/></svg> Back to Overview
+            </button>
+          </div>
+        </div>
+
+        <div class="fund-summary-banner">
+          <div class="fund-metric-box">
+            <p>Advance Pool Collected</p>
+            <strong>₹6,000.00</strong>
+            <small style="display: block; color: #8eaaff; margin-top: 4px;">₹2,000.00 × 3 students</small>
+          </div>
+          <div class="fund-metric-box">
+            <p>Disbursed for Bookings</p>
+            <strong style="color: #ff9d87;">₹3,200.00</strong>
+            <small style="display: block; color: #a4b6d8; margin-top: 4px;">Coach transfer to Jaipur</small>
+          </div>
+          <div class="fund-metric-box">
+            <p>Remaining Fund Balance</p>
+            <strong style="color: #8de2bc;">₹2,800.00</strong>
+            <small style="display: block; color: #8de2bc; margin-top: 4px;">Available for refunds / snacks</small>
+          </div>
+        </div>
+
+        <div class="settings-grid" style="margin-bottom: 24px;">
+          <div class="settings-card">
+            <div class="settings-card-head">
+              <div class="settings-card-icon" style="background: #142852; color: #8eaaff;"><svg class="icon"><use href="#i-wallet"/></svg></div>
+              <div>
+                <h3 class="settings-card-title">Member Advance Deposits</h3>
+                <p class="settings-card-desc">Initial ₹2,000 per student pooled prior to journey departure.</p>
+              </div>
+            </div>
+            <div style="display: grid; gap: 10px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; background: #111a30; border-radius: 10px;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <span class="avatar avatar-aman">A</span>
+                  <div><strong style="color: #fff; font-size: .88rem;">Aman Sharma</strong><small style="display: block; color: #8eaaff;">UPI Transfer</small></div>
+                </div>
+                <strong style="color: #8de2bc;">+₹2,000.00</strong>
+              </div>
+              <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; background: #111a30; border-radius: 10px;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <span class="avatar avatar-simran">S</span>
+                  <div><strong style="color: #fff; font-size: .88rem;">Simran Kaur</strong><small style="display: block; color: #8eaaff;">UPI Transfer</small></div>
+                </div>
+                <strong style="color: #8de2bc;">+₹2,000.00</strong>
+              </div>
+              <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; background: #111a30; border-radius: 10px;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <span class="avatar avatar-karan">K</span>
+                  <div><strong style="color: #fff; font-size: .88rem;">Karan Verma</strong><small style="display: block; color: #8eaaff;">Cash Deposit</small></div>
+                </div>
+                <strong style="color: #8de2bc;">+₹2,000.00</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="settings-card">
+            <div class="settings-card-head">
+              <div class="settings-card-icon" style="background: #194435; color: #8de2bc;"><svg class="icon"><use href="#i-bus"/></svg></div>
+              <div>
+                <h3 class="settings-card-title">Fund Disbursements</h3>
+                <p class="settings-card-desc">Expenses directly paid out of the pooled advance fund.</p>
+              </div>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px; background: #111a30; border-radius: 10px; margin-bottom: 10px;">
+              <div>
+                <strong style="color: #fff; display: block; font-size: .90rem;">Coach transfer booking</strong>
+                <small style="color: #9cb1d7;">16 Nov 2026 · Jaipur City Coaches</small>
+              </div>
+              <strong style="color: #ff9d87; font-size: 1.05rem;">-₹3,200.00</strong>
+            </div>
+            <p style="font-size: .80rem; color: #a4b6d8; line-height: 1.4;">Each student's advance fund share was reduced by ₹1,066.67. Remaining unspent balance (₹2,800.00) will be refunded equally upon trip completion.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="view-panel" id="view-members" hidden>
+        <div class="panel-page-header">
+          <div>
+            <h1 class="page-title">Group Members &amp; Roster</h1>
+            <p class="page-subtitle">Students and trip organizers participating in the Jaipur Industrial Visit workspace.</p>
+          </div>
+          <div class="page-header-actions">
+            <button type="button" class="pill-button add-expense" data-action="settings-add-member"><svg class="icon"><use href="#i-plus"/></svg> Add member</button>
+            <button type="button" class="pill-button secondary-button" data-action="back-to-overview">
+              <svg class="icon"><use href="#i-overview"/></svg> Back to Overview
+            </button>
+          </div>
+        </div>
+
+        <div class="members-view-grid">
+          <div class="member-profile-card">
+            <span class="avatar avatar-aman">A</span>
+            <div class="member-profile-info">
+              <h3>Aman Sharma</h3>
+              <p>aman@thrive.demo</p>
+              <span class="azure-badge" style="margin-top: 6px; background: #1b2f56; color: #8eaaff;">Trip Organizer</span>
+            </div>
+          </div>
+
+          <div class="member-profile-card">
+            <span class="avatar avatar-simran">S</span>
+            <div class="member-profile-info">
+              <h3>Simran Kaur</h3>
+              <p>simran@thrive.demo</p>
+              <span class="azure-badge" style="margin-top: 6px; background: #153328; color: #8de2bc;">Member</span>
+            </div>
+          </div>
+
+          <div class="member-profile-card">
+            <span class="avatar avatar-karan">K</span>
+            <div class="member-profile-info">
+              <h3>Karan Verma</h3>
+              <p>karan@thrive.demo</p>
+              <span class="azure-badge" style="margin-top: 6px; background: #153328; color: #8de2bc;">Member</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-card" style="margin-bottom: 24px;">
+          <div class="settings-card-head">
+            <div class="settings-card-icon" style="background: #142852; color: #8eaaff;"><svg class="icon"><use href="#i-members"/></svg></div>
+            <div>
+              <h3 class="settings-card-title">Shareable Workspace Invite Link</h3>
+              <p class="settings-card-desc">Share this secure token URL with students to grant immediate member access.</p>
+            </div>
+          </div>
+          <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+            <input type="text" readonly value="http://127.0.0.1:5050/?invite=jaipur-iv-2026" style="flex: 1; min-width: 260px; padding: 10px 14px; background: #111a30; border: 1px solid var(--line); border-radius: 8px; color: #d0dbf5; font-size: .88rem;" aria-label="Invite link">
+            <button type="button" class="pill-button add-expense" data-action="copy-invite"><svg class="icon"><use href="#i-check"/></svg> Copy Link</button>
+          </div>
+        </div>
+      </div>
 
       <div class="view-panel" id="view-settings" hidden>
         <div class="panel-page-header">

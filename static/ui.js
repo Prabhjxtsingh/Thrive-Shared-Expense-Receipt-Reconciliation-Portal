@@ -28,6 +28,7 @@ const paths = {
   trash: '<path d="M4 7h16M6 7l1 14h10l1-14M9 7V4h6v3m-5 4v6m4-6v6"/>',
   link: '<path d="m10 13 4-4m-6 6-1 1a3 3 0 0 1-4-4l3-3a3 3 0 0 1 4 0m4 6a3 3 0 0 0 4 0l3-3a3 3 0 0 0-4-4l-1 1"/>',
   settings: '<circle cx="12" cy="12" r="3"/><path d="M4.7 10a7.5 7.5 0 0 1 1-2.3l-1-1.8 1.2-1.2 1.8 1a7.5 7.5 0 0 1 2.3-1l.6-2h1.8l.6 2a7.5 7.5 0 0 1 2.3 1l1.8-1 1.2 1.2-1 1.8a7.5 7.5 0 0 1 1 2.3l2 .6v1.8l-2 .6a7.5 7.5 0 0 1-1 2.3l1 1.8-1.2 1.2-1.8-1a7.5 7.5 0 0 1-2.3 1l-.6 2h-1.8l-.6-2a7.5 7.5 0 0 1-2.3-1l-1.8 1-1.2-1.2 1-1.8a7.5 7.5 0 0 1-1-2.3l-2-.6v-1.8Z"/>',
+  sparkle: '<path d="m12 3 1.9 5.5a2 2 0 0 0 1.3 1.3L20.7 12l-5.5 1.9a2 2 0 0 0-1.3 1.3L12 20.7l-1.9-5.5a2 2 0 0 0-1.3-1.3L3.3 12l5.5-1.9a2 2 0 0 0 1.3-1.3Z"/>',
 };
 
 export const icon = (name, small = false) => `<svg class="icon${small ? " small" : ""}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths[name] || paths.file}</svg>`;

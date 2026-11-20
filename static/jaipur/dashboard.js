@@ -14,8 +14,13 @@
   function switchView(viewName) {
     const views = {
       overview: document.querySelector("#view-overview"),
-      settings: document.querySelector("#view-settings"),
+      expenses: document.querySelector("#view-expenses"),
+      receipts: document.querySelector("#view-receipts"),
+      balances: document.querySelector("#view-balances"),
+      fund: document.querySelector("#view-fund"),
+      members: document.querySelector("#view-members"),
       "ai-guide": document.querySelector("#view-ai-guide"),
+      settings: document.querySelector("#view-settings"),
     };
     for (const [key, el] of Object.entries(views)) {
       if (el) el.hidden = key !== viewName;
@@ -30,6 +35,16 @@
     }
     const crumbDivider = document.querySelector("#crumb-view-divider");
     const crumbTitle = document.querySelector("#crumb-view-title");
+    const titles = {
+      overview: "Overview",
+      expenses: "Expenses",
+      receipts: "Receipts & Azure AI",
+      balances: "Balances & Settlements",
+      fund: "Trip Advance Fund",
+      members: "Group Members",
+      "ai-guide": "AI-900 & Architecture",
+      settings: "Settings",
+    };
     if (crumbDivider && crumbTitle) {
       if (viewName === "overview") {
         crumbDivider.hidden = true;
@@ -37,12 +52,13 @@
       } else {
         crumbDivider.hidden = false;
         crumbTitle.hidden = false;
-        crumbTitle.textContent = viewName === "settings" ? "Settings" : "AI-900 & Architecture";
+        crumbTitle.textContent = titles[viewName] || "Workspace";
       }
     }
     if (viewName === "ai-guide") {
       initInteractiveCalc();
     }
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   function initInteractiveCalc() {
@@ -617,7 +633,7 @@
               document.exitFullscreen?.().catch(() => {});
             }
           } else if (action === "profile") {
-            window.location.href = `/workspace?group=${currentGroup.id}#account`;
+            openTool("Your profile", "<p>Aman Sharma · Trip Organizer (Jaipur Industrial Visit)</p>", button);
           } else if (action === "settings") {
             switchView("settings");
           } else if (action === "back-to-overview") {
@@ -860,6 +876,7 @@
       "upload-receipt": uploadReceipt,
       upload: uploadReceipt,
       search: searchExpenses,
+      "expenses-search": searchExpenses,
       notifications: () => toggleNotifications(),
       "toggle-fullscreen": () => {
         document.body.classList.toggle("force-fullscreen");
@@ -869,6 +886,23 @@
       profile: button => openTool("Your profile", "<p>Jaipur Industrial Visit · Group member</p>", button),
       settings: () => switchView("settings"),
       "back-to-overview": () => switchView("overview"),
+      "settle-simran": button => {
+        openTool("Record Settlement", "<p>Payment of <strong>₹262.50</strong> from <strong>Simran</strong> to <strong>Aman</strong> recorded via UPI. Balance updated upon confirmation.</p>", button);
+      },
+      "settle-karan": button => {
+        openTool("Record Settlement", "<p>Payment of <strong>₹315.00</strong> from <strong>Karan</strong> to <strong>Aman</strong> recorded via UPI. Balance updated upon confirmation.</p>", button);
+      },
+      "fund-contribute": button => {
+        openTool("Record Fund Advance", "<p>Record student advance payment into the Jaipur Trip Fund pool.</p>", button);
+      },
+      "copy-invite": async () => {
+        try {
+          await navigator.clipboard.writeText(window.location.origin + "/?invite=jaipur-iv-2026");
+          note("Invitation link copied to clipboard.");
+        } catch {
+          note("Invitation link: " + window.location.origin + "/?invite=jaipur-iv-2026");
+        }
+      },
       "new-group": button => {
         toggleGroupDropdown(false);
         formTool("Create a new group", `
@@ -886,16 +920,11 @@
       overview: () => switchView("overview"),
       settings: () => switchView("settings"),
       "ai-guide": () => switchView("ai-guide"),
-      expenses: () => {
-        filters[0].focus();
-      },
-      receipts: button => {
-        if (document.querySelector("#receipt-inbox")) focusSection("#receipt-inbox");
-        else uploadReceipt(button);
-      },
-      balances: button => openTool("Balances", "<p>Review the dinner receipt to reconcile member shares.</p>", button),
-      fund: button => openTool("Trip fund", "<p>Group advances and refunds appear in the trip fund ledger.</p>", button),
-      members: button => openTool("Members", "<p>Three members share expenses in the Jaipur Industrial Visit group.</p>", button),
+      expenses: () => { window.location.href = `/workspace?group=${currentGroup?.id || 3}#expenses`; },
+      receipts: () => { window.location.href = `/workspace?group=${currentGroup?.id || 3}#receipts`; },
+      balances: () => { window.location.href = `/workspace?group=${currentGroup?.id || 3}#balances`; },
+      fund: () => { window.location.href = `/workspace?group=${currentGroup?.id || 3}#fund`; },
+      members: () => { window.location.href = `/workspace?group=${currentGroup?.id || 3}#members`; },
     };
 
     document.addEventListener("click", event => {

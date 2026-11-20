@@ -148,6 +148,26 @@ def main():
                 expect(page.locator("#view-overview")).to_be_visible()
                 expect(view_ai).to_be_hidden()
 
+                # 5. Verify that Settings and AI-900 are visible in Jaipur index
+                for v in ["overview", "settings", "ai-guide"]:
+                    page.locator(f'[data-nav="{v}"]').click()
+                    target_view = page.locator(f"#view-{v}")
+                    expect(target_view).to_be_visible()
+                    expect(page.locator(f'[data-nav="{v}"]')).to_have_attribute("aria-current", "page")
+                    expect(page.locator('[data-nav="settings"]')).to_be_visible()
+                    expect(page.locator('[data-nav="ai-guide"]')).to_be_visible()
+
+                # 6. Verify that on EVERY page in /workspace, Settings and AI-900 are in the sidebar
+                page.goto(f"{base_url}/workspace?group=3")
+                workspace_sections = ["overview", "expenses", "receipts", "balances", "fund", "members", "ai-guide", "settings", "activity"]
+                for s in workspace_sections:
+                    page.goto(f"{base_url}/workspace?group=3#{s}")
+                    # Sidebar navigation links
+                    nav = page.locator(".navigation")
+                    expect(nav).to_be_visible()
+                    expect(nav.locator('a[href="#settings"]')).to_be_visible()
+                    expect(nav.locator('a[href="#ai-guide"]')).to_be_visible()
+
                 browser.close()
                 print("All new feature tests passed successfully!")
         finally:

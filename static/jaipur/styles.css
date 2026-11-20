@@ -49,16 +49,25 @@ a { color: inherit; text-decoration: none; }
   box-shadow: none;
 }
 .sidebar {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  max-height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
   display: flex;
   flex-direction: column;
   align-items: stretch;
   gap: 0;
-  padding: 34px 18px 28px 24px;
+  padding: 24px 16px 20px 20px;
   background: linear-gradient(172deg, var(--sidebar) 20%, #151d34 83%, #22283f);
   border-right: 1px solid #7896d611;
-  min-height: 100vh;
+  box-sizing: border-box;
+  scrollbar-width: thin;
+  scrollbar-color: #3a4769 transparent;
+  z-index: 20;
 }
-.wordmark { display: inline-flex; align-items: center; align-self: flex-start; gap: 10px; margin: 0 0 39px 3px; font-size: 1.49rem; font-weight: 760; letter-spacing: -.065em; }
+.wordmark { display: inline-flex; align-items: center; align-self: flex-start; gap: 10px; margin: 0 0 20px 3px; font-size: 1.49rem; font-weight: 760; letter-spacing: -.065em; }
 .brand-mark { width: 31px; height: 36px; color: #628aff; filter: drop-shadow(0 2px 6px #4265ed60); stroke-width: 2; }
 .nav-list { display: grid; gap: 7px; }
 .nav-list button {
@@ -1564,4 +1573,209 @@ dialog::backdrop { background: #050b1bb5; backdrop-filter: blur(3px); }
   line-height: 1.35;
   margin: 0;
 }
+
+.expense-item-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px 18px;
+  border-radius: 14px;
+  background: var(--control);
+  border: 1px solid var(--line);
+}
+.expense-item-card:hover {
+  background: #192544;
+  border-color: #5c7ac7;
+}
+
+/* ==========================================================================
+   Expenses, Receipts, Balances, Trip Fund, Members Page Views
+   ========================================================================== */
+.balances-grid, .receipts-view-grid, .members-view-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+}
+.balance-card-item {
+  padding: 22px;
+  border-radius: 16px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.balance-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.balance-user-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.balance-badge {
+  font-size: .72rem;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 999px;
+}
+.badge-creditor {
+  background: #194435;
+  color: #8de2bc;
+  border: 1px solid #2b6a53;
+}
+.badge-debtor {
+  background: #472620;
+  color: #ffb19f;
+  border: 1px solid #753b31;
+}
+.balance-metric {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.balance-metric-label {
+  font-size: .78rem;
+  color: #9cb1d7;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+.balance-amount-positive {
+  font-size: 1.85rem;
+  font-weight: 700;
+  color: #8de2bc;
+}
+.balance-amount-negative {
+  font-size: 1.85rem;
+  font-weight: 700;
+  color: #ff9d87;
+}
+.balance-sub-details {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  padding: 10px;
+  background: #111a30;
+  border-radius: 10px;
+  font-size: .80rem;
+  color: #a4b6d8;
+}
+.balance-sub-details strong {
+  display: block;
+  color: #fff;
+  font-size: .88rem;
+}
+.settlement-plan-box {
+  background: linear-gradient(145deg, #18233f, #12192c);
+  border: 1px solid #4864a6;
+  border-radius: 16px;
+  padding: 22px;
+  margin-bottom: 24px;
+}
+.settlement-step-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  margin-top: 10px;
+  background: #0f1628;
+  border: 1px solid #283a60;
+  border-radius: 12px;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.settlement-step-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.settle-arrow {
+  color: #799aff;
+  font-weight: 700;
+}
+.receipt-scan-card {
+  padding: 20px;
+  border-radius: 16px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.receipt-scan-card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+}
+.azure-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: #142852;
+  border: 1px solid #3c5fa4;
+  color: #92b8ff;
+  font-size: .70rem;
+  font-weight: 600;
+}
+.fund-summary-banner {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
+  margin-bottom: 24px;
+}
+.fund-metric-box {
+  padding: 18px 20px;
+  border-radius: 14px;
+  background: var(--card);
+  border: 1px solid var(--line);
+}
+.fund-metric-box p {
+  font-size: .78rem;
+  color: #9cb1d7;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  margin-bottom: 4px;
+}
+.fund-metric-box strong {
+  font-size: 1.65rem;
+  font-weight: 700;
+  color: #f2f5ff;
+}
+.member-profile-card {
+  padding: 20px;
+  border-radius: 16px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.member-profile-card .avatar {
+  width: 44px;
+  height: 44px;
+  font-size: 1.1rem;
+}
+.member-profile-info {
+  flex: 1;
+}
+.member-profile-info h3 {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #fff;
+  margin: 0 0 2px;
+}
+.member-profile-info p {
+  font-size: .80rem;
+  color: #9cb1d7;
+  margin: 0;
+}
+
 

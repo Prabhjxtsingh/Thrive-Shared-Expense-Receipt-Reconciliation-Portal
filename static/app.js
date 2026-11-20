@@ -85,7 +85,8 @@ function go(destination) {
 
 const sections = {
   overview: ["Overview", "grid"], expenses: ["Expenses", "receipt"], receipts: ["Receipts", "file"],
-  balances: ["Balances", "wallet"], fund: ["Trip fund", "bag"], members: ["Members", "users"], activity: ["Activity", "activity"],
+  balances: ["Balances", "wallet"], fund: ["Trip fund", "bag"], members: ["Members", "users"],
+  "ai-guide": ["AI-900 & Guide", "sparkle"], settings: ["Settings", "settings"], activity: ["Activity", "activity"],
 };
 
 async function route() {
@@ -248,6 +249,8 @@ function render() {
   const pages = {
     overview, expenses, receipts, balances, membersPage, activity, expense: expensePage,
     fund: () => fundPage({ fund: state.fund, organizer: organizer(), people: people() }),
+    "ai-guide": aiGuidePage,
+    settings: settingsPage,
   };
   root.innerHTML = shell(pages[state.route === "members" ? "membersPage" : state.route]());
 }
@@ -407,6 +410,51 @@ function membersPage() {
       <small>${member.id === state.user.id ? "You" : ""}</small></div>${pill(member.inactive_at ? "Former member" : member.role === "organizer" ? "Organizer" : "Member",
         member.role === "organizer" ? "blue" : "gray")}
       ${organizer() && !member.inactive_at ? btn("Edit role", "edit-role", { type: "compact", attrs: `data-id="${member.id}"` }) : ""}</div>`).join("")}</div></section>`;
+}
+
+function settingsPage() {
+  const group = state.data.group;
+  return pageHead("Settings", "Workspace rules, currency configuration, and data export") + `
+    <div class="dashboard-grid">
+      <section class="card">${cardHead("Group profile", "General workspace details")}
+        <div class="card-body">
+          <div class="selection-summary"><span>Group name</span><strong>${esc(group.name)}</strong></div>
+          <div class="selection-summary"><span>Created by</span><strong>${esc(state.user.name)}</strong></div>
+          <div class="selection-summary"><span>Currency</span><strong>INR (₹) · Integer Paise Engine</strong></div>
+          <div class="selection-summary"><span>Reconciliation mode</span><strong>Strict Zero Drift (Largest-Remainder)</strong></div>
+        </div>
+      </section>
+      <section class="card">${cardHead("Data export & audit", "Download accounting records")}
+        <div class="card-body">
+          <p style="font-size: .88rem; color: var(--muted); margin-bottom: 14px;">Export all recorded expenses, member shares, and bilateral settlement receipts.</p>
+          <div class="actions">${btn("Export group data (JSON)", "export-json", { symbol: "download" })}
+          <button type="button" class="side-button" onclick="window.print()">${icon("file")} Print audit report</button></div>
+        </div>
+      </section>
+    </div>`;
+}
+
+function aiGuidePage() {
+  return pageHead("AI-900 & Architecture Guide", "Visual blueprint of receipt reconciliation and Microsoft Azure AI-900 alignment") + `
+    <section class="card" style="margin-bottom: 20px;">${cardHead("Reconciliation pipeline", "Azure AI Document Intelligence to integer paise ledger")}
+      <div class="card-body">
+        <p style="font-size: .88rem; color: var(--muted); line-height: 1.5; margin-bottom: 14px;">
+          1. <strong>Capture &amp; Ingestion:</strong> Multi-format bill uploads validated with SHA-256 deduplication.<br>
+          2. <strong>Azure AI Model:</strong> Prebuilt-receipt foundation model extracts layout polygons, line items, and totals.<br>
+          3. <strong>Reconciliation:</strong> Arithmetic difference calculation flags missing taxes/adjustments before posting.<br>
+          4. <strong>Integer Paise Engine:</strong> Zero-drift proportional allocation distributes tax/discount without rounding errors.<br>
+          5. <strong>Bilateral Settlement:</strong> Minimal transfer optimization with recipient confirmation.
+        </p>
+      </div>
+    </section>
+    <section class="card">${cardHead("Microsoft Azure AI-900 curriculum alignment", "Official domain competencies")}
+      <div class="card-body">
+        <div class="selection-summary"><span>Domain 1: AI Workloads &amp; Considerations</span><strong>Responsible AI Principles &amp; Fairness</strong></div>
+        <div class="selection-summary"><span>Domain 2: Fundamental ML Principles</span><strong>Confidence Scores &amp; Feature Extraction</strong></div>
+        <div class="selection-summary"><span>Domain 3: Computer Vision Workloads</span><strong>Azure AI Document Intelligence (OCR)</strong></div>
+        <div class="selection-summary"><span>Domain 4: Generative AI &amp; Decision Support</span><strong>Discrepancy Identification &amp; Reasoning</strong></div>
+      </div>
+    </section>`;
 }
 
 function expensePage() {
@@ -1025,6 +1073,13 @@ const actions = {
     }
   },
   "go-overview": () => go("overview"),
+  "export-json": () => {
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state.data, null, 2));
+    const dl = document.createElement("a");
+    dl.setAttribute("href", dataStr);
+    dl.setAttribute("download", `thrive-export-${state.groupId}.json`);
+    dl.click();
+  },
   "new-group": groupModal,
   "switch-group": async ({ id }) => { await loadGroups(Number(id)); return go("overview"); },
   "new-expense": async (_, button) => {

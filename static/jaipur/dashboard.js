@@ -261,6 +261,13 @@
             searchExpenses(button);
           } else if (action === "notifications") {
             showNotifications(button);
+          } else if (action === "toggle-fullscreen") {
+            document.body.classList.toggle("force-fullscreen");
+            if (!document.fullscreenElement) {
+              document.documentElement.requestFullscreen?.().catch(() => {});
+            } else {
+              document.exitFullscreen?.().catch(() => {});
+            }
           } else if (action === "profile") {
             window.location.href = `/workspace?group=${currentGroup.id}#account`;
           } else if (action === "settings") {
@@ -499,6 +506,11 @@
       upload: uploadReceipt,
       search: searchExpenses,
       notifications: showNotifications,
+      "toggle-fullscreen": () => {
+        document.body.classList.toggle("force-fullscreen");
+        if (!document.fullscreenElement) document.documentElement.requestFullscreen?.().catch(() => {});
+        else document.exitFullscreen?.().catch(() => {});
+      },
       profile: button => openTool("Your profile", "<p>Jaipur Industrial Visit · Group member</p>", button),
       settings: button => openTool("Workspace settings", "<p>Jaipur Industrial Visit · Indian rupee (INR)</p>", button),
       logout: button => openTool("Demo workspace", "<p>You’re viewing the shared Jaipur group dashboard.</p>", button),

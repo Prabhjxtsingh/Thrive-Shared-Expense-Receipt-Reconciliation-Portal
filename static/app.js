@@ -2,13 +2,17 @@ import {
   amountInput, avatar, brand, btn, cardHead, dateLabel, empty, esc, icon, linkButton,
   money, pageHead, parseAmount, pill, scanPill, tile,
 } from "./ui.js";
+import { fundPage, openFundAction } from "./fund.js";
+import { duplicatePanel } from "./duplicates.js";
 
 const root = document.querySelector("#app");
 const dialog = document.querySelector("#dialog");
 const toast = document.querySelector("#toast");
+const themeKey = "thrive-theme";
+const themeColor = document.querySelector('meta[name="theme-color"]');
 const inviteToken = new URLSearchParams(location.search).get("invite");
 const state = {
-  csrf: "", user: null, demo: false, groups: [], groupId: null, data: null,
+  csrf: "", user: null, demo: false, groups: [], groupId: null, data: null, fund: null,
   route: "overview", expenseId: null, record: null, draft: null, result: null,
   previewError: "", editError: "", dirty: false, busy: false, authMode: "login", authError: "", pdfPage: 1,
 };
@@ -36,6 +40,19 @@ function message(text, error = false) {
   toast.className = error ? "error" : "";
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => { toast.textContent = ""; }, 4200);
+}
+
+function applyTheme(theme) {
+  document.documentElement.dataset.theme = theme;
+  themeColor.content = theme === "dark" ? "#0e1524" : "#151d32";
+}
+
+function themeSwitch() {
+  const dark = document.documentElement.dataset.theme === "dark";
+  return `<button type="button" class="theme-switch" data-action="toggle-theme" role="switch"
+    aria-label="Dark mode" aria-checked="${dark}" title="Dark mode">
+    <span class="theme-track" aria-hidden="true">${icon("sun", true)}${icon("moon", true)}</span>
+  </button>`;
 }
 
 function flashError(error) { message(error.message, true); }
@@ -68,7 +85,7 @@ function go(destination) {
 
 const sections = {
   overview: ["Overview", "grid"], expenses: ["Expenses", "receipt"], receipts: ["Receipts", "file"],
-  balances: ["Balances", "wallet"], members: ["Members", "users"], activity: ["Activity", "activity"],
+  balances: ["Balances", "wallet"], fund: ["Trip fund", "bag"], members: ["Members", "users"], activity: ["Activity", "activity"],
 };
 
 async function route() {
@@ -82,6 +99,7 @@ async function route() {
   state.result = null;
   state.record = null;
   state.draft = null;
+  state.fund = null;
   state.expenseId = null;
   state.pdfPage = 1;
   if (!state.user) return renderAuth();
@@ -91,6 +109,11 @@ async function route() {
     const group = state.groupId ? await api(groupPath()) : null;
     if (version !== navigation) return;
     state.data = group;
+    if (state.route === "fund" && group) {
+      const fund = await api(groupPath("/fund"));
+      if (version !== navigation) return;
+      state.fund = fund;
+    }
     if (state.route === "expense" && group) {
       state.expenseId = Number(id);
       const record = await api(expensePath());
@@ -142,6 +165,7 @@ function scheduleScanPoll() {
           if (state.dirty) {
             const status = document.querySelector("#scan-notices");
             if (status) status.innerHTML = scanNotices(record.receipt);
+            updateDuplicatePanel(record.receipt);
           } else {
             render();
             if (state.draft) refreshPreview();
@@ -196,12 +220,13 @@ function shell(content) {
           <span class="workspace-crumb">${esc(activeGroup?.name || "Workspace")}</span><span class="slash">/</span><span class="crumb-current">${page}</span>
         </div>
         <div class="top-actions">${state.demo ? '<span class="pill demo-label">Demo workspace</span>' : ""}
+          ${themeSwitch()}
           <div class="profile">
             <button class="profile-button" type="button" data-action="menu" data-menu="profile-menu" aria-label="Account menu" aria-expanded="false" aria-controls="profile-menu">
               ${avatar(state.user)}<span class="profile-copy"><strong>${esc(state.user.name)}</strong><small>${esc(activeGroup?.role || "Account")}</small></span>${icon("chevron", true)}
             </button>
             <div class="dropdown" id="profile-menu" hidden>
-              ${state.demo ? `<div class="dropdown-label">Switch demo member</div>${["Aman", "Simran", "Karan"].map(name =>
+              ${state.demo ? `<div class="dropdown-label">Switch demo member</div>${["Aman", "Simran", "Karan", "Nisha"].map(name =>
                 `<button type="button" data-action="demo-person" data-person="${name.toLowerCase()}">${icon("users", true)}${name}</button>`).join("")}<hr>` : ""}
               <button type="button" data-action="sign-out">${icon("logout", true)}Sign out</button>
             </div>
@@ -220,7 +245,10 @@ function render() {
         btn("Create group", "new-group", { type: "primary", symbol: "plus" }))}</section>`);
     return;
   }
-  const pages = { overview, expenses, receipts, balances, membersPage, activity, expense: expensePage };
+  const pages = {
+    overview, expenses, receipts, balances, membersPage, activity, expense: expensePage,
+    fund: () => fundPage({ fund: state.fund, organizer: organizer(), people: people() }),
+  };
   root.innerHTML = shell(pages[state.route === "members" ? "membersPage" : state.route]());
 }
 
@@ -259,6 +287,14 @@ function metric(symbol, tone, label, value) {
   return `<div class="metric">${tile(symbol, tone)}<div><p>${label}</p><strong>${value}</strong></div></div>`;
 }
 
+const paymentMethods = { "": "Unspecified", cash: "Cash", upi: "UPI", bank: "Bank transfer", card: "Card", other: "Other" };
+const payerName = (id, short = false) => id === null ? "Trip fund" : short ? firstName(id) : personName(id);
+
+function payerList(contributions, short = false) {
+  const payers = [...new Set(contributions.map(payment => payerName(payment.member_id, short)))];
+  return short && payers.length > 2 ? `${payers[0]} + ${payers.length - 1}` : payers.join(", ");
+}
+
 function expenseTable(entries, receiptOnly = false) {
   if (!entries.length) return empty(receiptOnly ? "No receipts uploaded" : "No expenses yet",
     receiptOnly ? "Uploaded bills and their scan status will appear here." : "Add a manual expense or upload your first receipt.",
@@ -276,7 +312,7 @@ function expenseTable(entries, receiptOnly = false) {
         : entry.scan_status && entry.scan_status !== "ready" ? scanPill(entry.scan_status) : pill("Draft", "amber");
       return `<tr><td><a href="${expenseLink(entry.id)}" class="expense-name">${tile(symbol, color)}<span>
         <strong>${esc(label)}</strong><small>${dateLabel(entry.purchase_date || entry.draft_purchase_date || entry.created_at)}${entry.dispute_count ? " · Question open" : ""}</small></span></a></td>
-        <td class="payer-col">${entry.payer_id ? esc(firstName(entry.payer_id)) : "—"}</td>
+        <td class="payer-col" title="${esc(payerList(entry.contributions))}">${esc(payerList(entry.contributions, true) || "—")}</td>
         <td class="amount">${money(entry.total_paise ?? entry.draft_total_paise)}</td><td>${status}</td></tr>`;
     }).join("")}</tbody></table></div>`;
 }
@@ -341,6 +377,7 @@ const eventLabels = {
   draft_created: ["started an expense draft", "file"],
   draft_updated: ["saved receipt changes", "file"], receipt_uploaded: ["uploaded a receipt", "upload"],
   receipt_scanned: ["finished a receipt scan", "receipt"], expense_posted: ["posted an expense", "receipt"],
+  receipt_match_reviewed: ["reviewed a receipt match", "receipt"],
   correction_proposed: ["proposed a correction", "file"], correction_approved: ["approved a correction", "check"],
   dispute_opened: ["asked a question", "message"], dispute_resolved: ["resolved a question", "check"],
   payment_recorded: ["recorded a payment", "payment"], payment_confirmed: ["confirmed a payment", "circle"],
@@ -379,11 +416,12 @@ function expensePage() {
   const actions = current && !state.draft ? btn("Propose correction", "correction", { symbol: "file" }) : "";
   const detail = state.draft
     ? current ? "Review proposed shares before approving the correction." : "Check the receipt details and assign each share."
-    : `Paid by ${personName(current.payer_id)} · ${dateLabel(current.purchase_date)}`;
+    : `Paid by ${payerList(current.contributions)} · ${dateLabel(current.purchase_date)}`;
   const left = receipt ? originalPanel(receipt) : state.draft ? "" : revisionHistory(current);
   const right = state.draft ? reviewForm(current) : postedDetails(current);
   return pageHead(title, detail, actions) + `
     <div id="scan-notices">${scanNotices(receipt)}</div>
+    <div id="duplicate-matches">${duplicatePanel(receipt)}</div>
     ${left ? `<div class="two-columns review-layout">${left}<div class="stack">${right}</div></div>` : `<div class="stack">${right}</div>`}
     ${current && receipt ? revisionHistory(current) : ""}
     ${current ? disputePanel(current) : ""}`;
@@ -391,12 +429,19 @@ function expensePage() {
 
 function scanNotices(receipt) {
   if (!receipt) return "";
-  const { scan_status: status, scan_error: error, duplicate_of: duplicate } = receipt;
-  return (duplicate ? '<p class="notice warning">An identical receipt is already in this group. Review it before posting.</p>' : "") +
-    (status === "queued" || status === "processing" ? `<p class="notice" role="status">${icon("clock", true)}
+  const { scan_status: status, scan_error: error } = receipt;
+  return (status === "queued" || status === "processing" ? `<p class="notice" role="status">${icon("clock", true)}
       ${status === "queued" ? "Scan queued." : "Scanning the receipt."} You can also enter the details manually.</p>` : "") +
     (status === "failed" ? `<p class="notice warning">${esc(error || "The scan failed. Enter the details manually.")}
       <button class="text-button" type="button" data-action="retry-scan">Retry scan</button></p>` : "");
+}
+
+function updateDuplicatePanel(receipt, focusId) {
+  const panel = root.querySelector("#duplicate-matches");
+  if (!panel) return;
+  const openIds = [...panel.querySelectorAll("details[open]")].map(entry => Number(entry.dataset.matchId));
+  panel.innerHTML = duplicatePanel(receipt, openIds);
+  if (focusId) panel.querySelector(`[data-match-id="${focusId}"] summary`)?.focus();
 }
 
 function originalPanel(receipt) {
@@ -448,20 +493,24 @@ const adjustmentLabels = { tax: "Tax", discount: "Discount", rounding: "Rounding
 
 function reviewForm(current) {
   const draft = state.draft;
-  const canPost = !current || organizer();
+  const organizerRequired = current || draft.contributions.some(payment => payment.member_id === null);
+  const canPost = !organizerRequired || organizer();
   return `<section class="card">${cardHead(current ? "Correction draft" : "Review and split",
     current ? "The posted shares stay active until approval." : "Confirm the printed amounts and who shared the bill.",
     pill(`Draft · v${draft.version}`, "amber"))}
     <div class="card-body">
-      ${current && !canPost ? '<p class="notice draft-banner">Save your changes for an organizer to review and approve.</p>' : ""}
+      ${!canPost ? '<p class="notice draft-banner">Save your changes for an organizer to review and approve.</p>' : ""}
       <div id="review-error" aria-live="polite">${reviewError()}</div>
       <div class="form-grid">
         ${field("Merchant", draftInput("merchant", draft.merchant, "text", 'maxlength="160" placeholder="e.g. The Campus Kitchen"'), "merchant")}
         ${field("Purchase date", draftInput("purchase_date", draft.purchase_date, "date"), "purchase_date")}
-        ${field("Paid by", `<select data-path="payer_id">${memberOptions(draft.payer_id)}</select>`, "payer_id")}
         ${field("Receipt total (₹)", moneyInput("total_paise", draft.total_paise), "total_paise")}
         ${field("Printed subtotal (₹)", moneyInput("subtotal_paise", draft.subtotal_paise), "subtotal_paise", "Optional when the receipt lists no subtotal.")}
       </div>
+      <hr class="divider">
+      <div class="section-heading"><h3>Payer contributions</h3>${btn("Add payer", "add-payer", { type: "compact", symbol: "plus" })}</div>
+      ${draft.contributions.map(contributionEditor).join("")}
+      <div id="funding-summary" aria-live="polite">${fundingSummary()}</div>
       <hr class="divider">
       <div class="section-heading"><h3>Split method</h3></div>
       <div class="segments" role="group" aria-label="Split method">
@@ -488,6 +537,45 @@ function reviewForm(current) {
           { type: "primary", symbol: "check", attrs: state.busy ? "disabled" : "" }) : ""}
       </div>
     </div></section>`;
+}
+
+function contributionEditor(payment, index) {
+  const path = `contributions.${index}`;
+  const onlyPayer = state.draft.contributions.length === 1;
+  const fundPayment = payment.member_id === null;
+  const amount = typeof payment.amount_paise === "string" ? payment.amount_paise : amountInput(payment.amount_paise);
+  const methodOptions = Object.entries(paymentMethods).map(([value, label]) =>
+    `<option value="${value}" ${value === payment.method ? "selected" : ""}>${label}</option>`).join("");
+  return `<div class="edit-row" role="group" aria-label="Payer contribution ${index + 1}">
+    <div class="edit-row-grid contribution-grid">
+      ${field("Paid by", `<select data-path="${path}.member_id">${memberOptions(payment.member_id)}
+        <option value="fund" ${fundPayment ? "selected" : ""}>Trip fund</option></select>`, `${path}.member_id`)}
+      ${field("Amount paid (₹)", draftInput(`${path}.amount_paise`, amount, "text",
+        `inputmode="decimal" placeholder="${onlyPayer ? "Full receipt total" : "0.00"}"`), `${path}.amount_paise`)}
+      ${fundPayment ? '<span class="muted contribution-fund">Group advance balance</span>' :
+        field("Payment method", `<select data-path="${path}.method">${methodOptions}</select>`)}
+      ${onlyPayer ? "" : `<button type="button" data-action="remove-payer" data-index="${index}" class="icon-button"
+        aria-label="Remove payer ${index + 1}">${icon("trash", true)}</button>`}
+    </div>
+  </div>`;
+}
+
+function fundingSummary() {
+  const result = state.result;
+  if (!result) return "";
+  const difference = result.contribution_difference_paise;
+  const fundingIssue = result.issues.find(issue => issue.field === "contributions");
+  if (difference) return `<p class="notice warning">${money(Math.abs(difference))}
+    ${difference > 0 ? "is still unfunded." : "exceeds the receipt total."} Contributions total ${money(result.contribution_total_paise)}.</p>`;
+  if (fundingIssue) return `<p class="notice warning">${esc(fundingIssue.message)}</p>`;
+  if (!result.contribution_total_paise) return "";
+  return `<div class="selection-summary"><span>Contributions total</span><strong class="amount">${money(result.contribution_total_paise)}</strong></div>`;
+}
+
+function contributionRows(contributions) {
+  return contributions.map(payment => `<div class="selection-summary">
+    <span>${esc(payerName(payment.member_id))}${payment.method ? ` <small class="muted">· ${esc(paymentMethods[payment.method])}</small>` : ""}</span>
+    <strong class="amount">${money(payment.amount_paise)}</strong></div>`).join("");
 }
 
 function itemEditor(item, index, mode) {
@@ -587,6 +675,7 @@ function postedDetails(current) {
       <small class="muted">${esc(item.member_ids.map(firstName).join(", "))}</small></div><strong>${money(item.amount_paise)}</strong></div>`).join("")}
     ${current.adjustments.map(adjustment => `<div class="selection-summary"><span>${esc(adjustmentLabels[adjustment.kind])}
       ${adjustment.included ? '<small class="muted">· Included</small>' : ""}</span><strong>${money(adjustment.amount_paise)}</strong></div>`).join("")}
+    <hr class="divider"><h3>Payer contributions</h3>${contributionRows(current.contributions)}
     <hr class="divider"><h3>Member shares</h3>${shareRows(current.shares)}</div></section>`;
 }
 
@@ -597,7 +686,8 @@ function revisionHistory(current) {
       ${version.id === current.id ? " · Current" : ""} · ${money(version.total_paise)}</summary>
       <div class="selection-summary"><span>${esc(version.posted_by_name || "Group member")} approved</span><span>${dateLabel(version.posted_at)}</span></div>
       ${version.items.map(item => `<div class="selection-summary"><span>${esc(item.description)} · ${esc(item.member_ids.map(firstName).join(", "))}</span><span>${money(item.amount_paise)}</span></div>`).join("")}
-      ${shareRows(version.shares)}</details>`).join("")}</div></section>`;
+      <h3>Payer contributions</h3>${contributionRows(version.contributions)}
+      <h3>Member shares</h3>${shareRows(version.shares)}</details>`).join("")}</div></section>`;
 }
 
 function disputePanel(current) {
@@ -618,7 +708,9 @@ function draftPayload() {
   const convert = value => typeof value === "string" ? parseAmount(value) : value;
   draft.total_paise = convert(draft.total_paise);
   draft.subtotal_paise = convert(draft.subtotal_paise);
-  for (const entry of [...draft.items, ...draft.adjustments]) entry.amount_paise = convert(entry.amount_paise);
+  for (const entry of [...draft.contributions, ...draft.items, ...draft.adjustments]) {
+    entry.amount_paise = convert(entry.amount_paise);
+  }
   return { revision_id: draft.id, edit_version: draft.edit_version, draft };
 }
 
@@ -627,6 +719,7 @@ function drawPreview() {
   if (!container) return;
   const current = state.record.revisions.find(version => version.id === state.record.expense.current_revision_id);
   container.innerHTML = sharePreview(current);
+  root.querySelector("#funding-summary").innerHTML = fundingSummary();
   markFields();
 }
 
@@ -675,10 +768,13 @@ root.addEventListener("input", event => {
     if (input.checked) members.add(id);
     else members.delete(id);
     target[key] = [...members];
+  } else if (key === "member_id") {
+    target.member_id = input.value === "fund" ? null : Number(input.value);
+    if (target.member_id === null) target.method = "";
   } else {
-    target[key] = input.type === "checkbox" ? input.checked : key === "payer_id" ? Number(input.value) : input.value;
+    target[key] = input.type === "checkbox" ? input.checked : input.value;
   }
-  if (key === "kind") markDirty(true, `[data-path="${path}"]`);
+  if (key === "kind" || key === "member_id") markDirty(true, `[data-path="${path}"]`);
   else markDirty();
 });
 
@@ -731,7 +827,8 @@ function renderAuth() {
   root.innerHTML = `<div class="auth-screen">
     <section class="auth-branding">${brand()}<div><h1>Shared expenses, settled together.</h1>
       <p>Keep group bills, everyone’s shares, and confirmed payments in one workspace.</p></div></section>
-    <main class="auth-wrapper"><section class="card"><h2>${registering ? "Create your account" : "Sign in to Thrive"}</h2>
+    <main class="auth-wrapper"><section class="card">
+      <header class="auth-heading"><h2>${registering ? "Create your account" : "Sign in to Thrive"}</h2>${themeSwitch()}</header>
       ${inviteToken ? '<p class="muted">Sign in to review your group invitation.</p>' : ""}
       ${state.authError ? `<p class="notice error" role="alert">${esc(state.authError)}</p>` : ""}
       <form class="form-stack" id="auth-form">
@@ -813,7 +910,7 @@ function invitationPrompt() {
   if (!inviteToken) return;
   modal("Join a group", `<p class="muted">Accept this invitation as ${esc(state.user.name)}.</p>`, async () => {
     const result = await api("/api/invites/accept", "POST", { token: inviteToken });
-    history.replaceState(null, "", "/#overview");
+    history.replaceState(null, "", "/workspace#overview");
     await loadGroups(result.id);
     await route();
     message("You joined the group.");
@@ -824,7 +921,15 @@ function uploadModal() {
   const groupId = state.groupId;
   modal("Upload a receipt", `<label class="drop-zone">${icon("upload")}<strong>Choose a file or drag it here</strong>
     <small>JPG, PNG or PDF · Up to 10 MB</small><input type="file" name="receipt" accept=".jpg,.jpeg,.png,.pdf" required></label>
-    ${state.demo ? '<p><a class="text-button" href="/api/demo/receipt">Download the sample dinner receipt</a></p>' : ""}`,
+    ${state.demo ? `<details class="version">
+      <summary>Demo receipt samples</summary>
+      <ul>
+        <li><a class="text-button" href="/api/demo/receipt">Original dinner receipt</a></li>
+        <li><a class="text-button" href="/api/demo/receipt?sample=second-photo">Second photo of the same bill</a></li>
+        <li><a class="text-button" href="/api/demo/receipt?sample=cropped-number">Photo with the receipt number cropped out</a></li>
+        <li><a class="text-button" href="/api/demo/receipt?sample=separate-purchase">Separate purchase with the same total</a></li>
+      </ul>
+    </details>` : ""}`,
   async data => {
     const result = await api(`/api/groups/${groupId}/receipts`, "POST", data);
     go(`expense/${result.expense_id}`);
@@ -905,6 +1010,20 @@ function toggleMobile(open) {
 }
 
 const actions = {
+  ...Object.fromEntries(["fund-deposit", "fund-close", "fund-refund"].map(action => [action, ({ memberId }) =>
+    openFundAction(action, { fund: state.fund, memberId: Number(memberId), organizer: organizer(),
+      people: people(), groupPath, api, modal, field, refresh: route, message })])),
+  "toggle-theme": (_, button) => {
+    const dark = button.getAttribute("aria-checked") !== "true";
+    const theme = dark ? "dark" : "light";
+    applyTheme(theme);
+    button.setAttribute("aria-checked", String(dark));
+    try {
+      localStorage.setItem(themeKey, theme);
+    } catch {
+      // The switch still works when browser storage is unavailable.
+    }
+  },
   "go-overview": () => go("overview"),
   "new-group": groupModal,
   "switch-group": async ({ id }) => { await loadGroups(Number(id)); return go("overview"); },
@@ -957,6 +1076,14 @@ const actions = {
     markDirty(true, `[data-path="items.${state.draft.items.length - 1}.description"]`);
   },
   "remove-item": ({ index }) => { state.draft.items.splice(Number(index), 1); markDirty(true); },
+  "add-payer": () => {
+    const currentPayers = state.draft.contributions.map(payment => payment.member_id);
+    const payer = activePeople().find(member => !currentPayers.includes(member.id));
+    const index = state.draft.contributions.length;
+    state.draft.contributions.push({ member_id: payer?.id ?? state.user.id, amount_paise: null, method: "" });
+    markDirty(true, `[data-path="contributions.${index}.amount_paise"]`);
+  },
+  "remove-payer": ({ index }) => { state.draft.contributions.splice(Number(index), 1); markDirty(true); },
   "add-adjustment": () => {
     state.draft.adjustments.push({ kind: "tax", amount_paise: null, included: false });
     markDirty(true, `[data-path="adjustments.${state.draft.adjustments.length - 1}.amount_paise"]`);
@@ -979,6 +1106,18 @@ const actions = {
     document.querySelector("#scan-notices").innerHTML = scanNotices(state.record.receipt);
     scheduleScanPoll();
   },
+  "review-receipt-match": async ({ id, decision }, button) => {
+    const current = state.record?.receipt;
+    if (!current || state.busy) return;
+    button.disabled = true;
+    try {
+      const receipt = await api(`/api/receipts/${current.id}/matches/${id}`, "PATCH", { decision });
+      if (state.record?.receipt?.id !== current.id) return;
+      state.record.receipt = receipt;
+      updateDuplicatePanel(receipt, Number(id));
+      message(decision === "duplicate" ? "Receipt marked as a duplicate." : "Receipt marked as a separate purchase.");
+    } finally { button.disabled = false; }
+  },
   correction: async () => { await api(expensePath("/corrections"), "POST", {}); await route(); },
   payment: ({ id, amount }) => paymentModal(Number(id), Number(amount)),
   "confirm-payment": ({ id }) => confirmPaymentModal(Number(id)),
@@ -995,7 +1134,7 @@ document.addEventListener("click", async event => {
   }
   const action = button.dataset.action;
   if (action !== "menu") closeMenus();
-  if (state.busy && ["split-mode", "add-item", "remove-item", "add-adjustment", "remove-adjustment"].includes(action)) return;
+  if (state.busy && ["split-mode", "add-item", "remove-item", "add-adjustment", "remove-adjustment", "add-payer", "remove-payer"].includes(action)) return;
   try { await actions[action]?.(button.dataset, button); }
   catch (error) { flashError(error); }
 });
@@ -1028,6 +1167,14 @@ root.addEventListener("submit", async event => {
 });
 
 window.addEventListener("hashchange", route);
+
+let savedTheme;
+try {
+  savedTheme = localStorage.getItem(themeKey);
+} catch {
+  // Use the default theme when browser storage is unavailable.
+}
+applyTheme(savedTheme === "dark" ? "dark" : "light");
 
 try {
   const account = await api("/api/session" + (inviteToken ? "?invite=1" : ""));

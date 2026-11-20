@@ -23,15 +23,27 @@ def close_db(_error):
 def initialize():
     connection = db()
     connection.execute("PRAGMA journal_mode = WAL")
-    version = connection.execute("PRAGMA user_version").fetchone()[0]
-    if version == 0:
-        schema = Path(__file__).with_name("schema.sql").read_text(encoding="utf-8")
-        connection.executescript("BEGIN IMMEDIATE;\n" + schema + "\nPRAGMA user_version = 2;\nCOMMIT;")
-    elif version == 1:
-        with transaction() as conn:
-            if conn.execute("PRAGMA user_version").fetchone()[0] == 1:
-                conn.execute("ALTER TABLE receipts ADD COLUMN pdf_pages INTEGER")
-                conn.execute("PRAGMA user_version = 2")
+    with transaction() as conn:
+        version = conn.execute("PRAGMA user_version").fetchone()[0]
+        if version == 0:
+            apply_schema(conn, "schema.sql")
+        elif version == 1:
+            conn.execute("ALTER TABLE receipts ADD COLUMN pdf_pages INTEGER")
+        if version < 3:
+            apply_schema(conn, "migrations/003_expense_funding.sql")
+            conn.execute("PRAGMA user_version = 3")
+
+
+def apply_schema(conn, filename):
+    sql = Path(__file__).parent.joinpath(filename).read_text(encoding="utf-8")
+    statement = ""
+    for line in sql.splitlines(keepends=True):
+        statement += line
+        if sqlite3.complete_statement(statement):
+            conn.execute(statement)
+            statement = ""
+    if statement.strip():
+        raise ValueError(f"Incomplete migration statement in {filename}")
 
 
 @contextmanager

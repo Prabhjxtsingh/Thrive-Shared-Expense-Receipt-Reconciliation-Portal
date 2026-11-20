@@ -11,6 +11,8 @@ const paths = {
   download: '<path d="M12 4v12m-4-4 4 4 4-4M4 17v3h16v-3"/>',
   bag: '<rect x="3" y="7" width="18" height="14" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 13h18m-11 0v2h4v-2"/>',
   clock: '<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5v5l3 1.5"/>',
+  sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.4 1.4m11.2 11.2L19 19M5 19l1.4-1.4M17.6 6.4 19 5"/>',
+  moon: '<path d="M20.8 14A8.9 8.9 0 0 1 10 3.2 9 9 0 1 0 20.8 14Z"/>',
   check: '<path d="m5 12 4 4 10-10"/>',
   circle: '<circle cx="12" cy="12" r="9"/><path d="m8 12 2.5 2.5L16 9"/>',
   utensils: '<path d="M5 3v5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2V3M8 3v18m10 0V3c-2 2-3 5-3 8v2h3"/>',

@@ -9,6 +9,7 @@ from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont
 from werkzeug.security import generate_password_hash
 
+from fund import record_fund_entry
 from ledger import audit, create_revision, post_revision, revision
 from reconciliation import blank_draft, preview
 
@@ -52,8 +53,25 @@ def sample_receipt():
 
 
 def seed(conn, receipt_dir):
-    if conn.execute("SELECT 1 FROM groups LIMIT 1").fetchone():
-        return
+    if not conn.execute("SELECT 1 FROM groups LIMIT 1").fetchone():
+        seed_industrial_visit(conn, receipt_dir)
+    seed_jaipur(conn)
+
+
+def post_sample_expense(conn, group_id, members, draft, receipt_id=None):
+    author = draft["payer_id"]
+    expense_id = conn.execute("INSERT INTO expenses(group_id, receipt_id, created_by) VALUES (?, ?, ?)",
+                              (group_id, receipt_id, author)).lastrowid
+    revision_id = create_revision(conn, expense_id, 1, author, draft)
+    row = conn.execute("SELECT * FROM expense_revisions WHERE id = ?", (revision_id,)).fetchone()
+    expense = conn.execute("SELECT * FROM expenses WHERE id = ?", (expense_id,)).fetchone()
+    result = preview(revision(conn, row), set(members))
+    if result["issues"]:
+        raise ValueError(f"Cannot post demo expense: {result['issues']}")
+    post_revision(conn, expense, row, result["shares"], author)
+
+
+def seed_industrial_visit(conn, receipt_dir):
     from receipt_extraction import normalize_extraction
 
     users = []
@@ -68,19 +86,10 @@ def seed(conn, receipt_dir):
                      [(group_id, person, "organizer" if person == aman else "member") for person in users])
     audit(conn, group_id, aman, "group_created", "Industrial Visit ’26")
 
-    def add(draft, receipt_id=None):
-        payer = draft["payer_id"]
-        expense_id = conn.execute("INSERT INTO expenses(group_id, receipt_id, created_by) VALUES (?, ?, ?)",
-                                  (group_id, receipt_id, payer)).lastrowid
-        revision_id = create_revision(conn, expense_id, 1, payer, draft)
-        row = conn.execute("SELECT * FROM expense_revisions WHERE id = ?", (revision_id,)).fetchone()
-        expense = conn.execute("SELECT * FROM expenses WHERE id = ?", (expense_id,)).fetchone()
-        post_revision(conn, expense, row, preview(revision(conn, row), set(users))["shares"], payer)
-
-    add(dict(blank_draft(karan), merchant="Morning coffee", purchase_date="2026-11-16",
-             total_paise=24000, member_ids=[karan]))
-    add(dict(blank_draft(simran), merchant="Station cab", purchase_date="2026-11-17",
-             total_paise=45000, member_ids=[simran]))
+    post_sample_expense(conn, group_id, users, dict(blank_draft(karan), merchant="Morning coffee",
+                        purchase_date="2026-11-16", total_paise=24000, member_ids=[karan]))
+    post_sample_expense(conn, group_id, users, dict(blank_draft(simran), merchant="Station cab",
+                        purchase_date="2026-11-17", total_paise=45000, member_ids=[simran]))
     original = sample_receipt()
     key = SAMPLE_KEY
     (receipt_dir / key).write_bytes(original)
@@ -94,4 +103,41 @@ def seed(conn, receipt_dir):
     ).lastrowid
     for item, people in zip(draft["items"], ([aman, simran], [karan], users)):
         item["member_ids"] = people
-    add(draft, receipt_id)
+    post_sample_expense(conn, group_id, users, draft, receipt_id)
+
+
+def seed_jaipur(conn):
+    if conn.execute("SELECT 1 FROM app_settings WHERE name = 'jaipur_demo_group'").fetchone():
+        return
+    from receipt_extraction import normalize_extraction
+
+    people = []
+    for name in ("Aman", "Simran", "Karan"):
+        person = conn.execute("SELECT id FROM users WHERE email = ?", (name.lower() + "@thrive.demo",)).fetchone()
+        if person is None:
+            return
+        people.append(person["id"])
+    aman, simran, karan = people
+    conn.execute("INSERT OR IGNORE INTO users(name, email, password_hash) VALUES (?, ?, ?)",
+                 ("Nisha Rao", "nisha@thrive.demo", generate_password_hash("thrive-demo")))
+    nisha = conn.execute("SELECT id FROM users WHERE email = 'nisha@thrive.demo'").fetchone()["id"]
+    people.append(nisha)
+    group_id = conn.execute("INSERT INTO groups(name, description) VALUES (?, ?)",
+                            ("Jaipur Trip", "College visit • ₹1,000 advance per member")).lastrowid
+    conn.execute("INSERT INTO app_settings(name, value) VALUES ('jaipur_demo_group', ?)", (str(group_id),))
+    conn.executemany("INSERT INTO group_members(group_id, user_id, role) VALUES (?, ?, ?)",
+                     [(group_id, person, "organizer" if person == aman else "member") for person in people])
+    audit(conn, group_id, aman, "group_created", "Jaipur Trip")
+    for person in people:
+        record_fund_entry(conn, group_id, aman, "deposit", person, 100000, f"demo-deposit-{person}")
+
+    transport = dict(blank_draft(aman), merchant="Jaipur coach transport", purchase_date="2026-11-17",
+                     total_paise=320000, member_ids=people,
+                     contributions=[dict(member_id=None, amount_paise=320000, method="")])
+    post_sample_expense(conn, group_id, people, transport)
+    dinner, _ = normalize_extraction(azure_fixture(), aman, people)
+    for item, participants in zip(dinner["items"], ([aman, simran], [karan], [aman, simran, karan])):
+        item["member_ids"] = participants
+    dinner["contributions"] = [dict(member_id=aman, amount_paise=50000, method="cash"),
+                               dict(member_id=simran, amount_paise=34000, method="upi")]
+    post_sample_expense(conn, group_id, people, dinner)

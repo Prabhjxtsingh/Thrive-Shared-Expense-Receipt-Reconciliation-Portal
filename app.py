@@ -11,13 +11,16 @@ import re
 import secrets
 from threading import Event
 
-from flask import Flask, current_app, g, jsonify, render_template, request, send_file, session, url_for
+from flask import Flask, current_app, g, jsonify, redirect, render_template, request, send_file, session, url_for
 from werkzeug.exceptions import HTTPException
 from werkzeug.security import check_password_hash, generate_password_hash
 from werkzeug.utils import secure_filename
 
 from database import close_db, db, initialize, transaction
 from demo import installed_sample, seed
+from demo_receipts import backfill_demo_identifier, demo_variants
+from duplicate_receipts import Signature, confirmed_posted_duplicate, receipt_matches
+from fund import FundError, begin_refunds, fund_state, record_fund_entry, validate_funding
 from ledger import active_ids, audit, create_revision, group_ledger, members, post_revision, revision, write_draft
 from receipt_extraction import PdfiumError, pdf_page_count, render_pdf_page, run_worker, start_worker, validate_file
 from reconciliation import MAX_PAISE, blank_draft, normalize, preview
@@ -129,7 +132,8 @@ def same_edit(row, data):
 
 
 def validate_draft_members(conn, group_id, draft):
-    selected = {draft["payer_id"], *draft["member_ids"]}
+    selected = {entry["member_id"] for entry in draft["contributions"] if entry["member_id"] is not None}
+    selected.update(draft["member_ids"])
     for item in draft["items"]:
         selected.update(item["member_ids"])
     if not selected <= active_ids(conn, group_id):
@@ -137,7 +141,7 @@ def validate_draft_members(conn, group_id, draft):
 
 
 def expense_summary(conn, group_id):
-    return [dict(row) for row in conn.execute(
+    expenses = {row["id"]: dict(row, contributions=[]) for row in conn.execute(
         """SELECT e.id, e.receipt_id, e.created_at, e.current_revision_id, r.merchant, r.purchase_date,
            r.payer_id, r.total_paise, r.mode, d.id AS draft_id, d.merchant AS draft_merchant,
            d.purchase_date AS draft_purchase_date, d.total_paise AS draft_total_paise, re.scan_status,
@@ -146,11 +150,25 @@ def expense_summary(conn, group_id):
            LEFT JOIN expense_revisions d ON e.id = d.expense_id AND d.status = 'draft'
            LEFT JOIN receipts re ON e.receipt_id = re.id
            WHERE e.group_id = ? ORDER BY e.id DESC""", (group_id,)
-    )]
+    )}
+    for row in conn.execute(
+        """SELECT e.id AS expense_id, c.member_id, c.amount_paise, c.method FROM expenses e
+           JOIN expense_contributions c ON c.revision_id = e.current_revision_id
+           WHERE e.group_id = ? ORDER BY c.position""", (group_id,),
+    ):
+        payment = dict(row)
+        expenses[payment.pop("expense_id")]["contributions"].append(payment)
+    return list(expenses.values())
 
 
-def receipt_data(row, expense_id):
+def receipt_data(conn, row, expense_id):
     extraction = json.loads(row["extraction_json"]) if row["extraction_json"] else {}
+    signature = Signature.from_extraction(extraction)
+    matches = receipt_matches(conn, row, signature)
+    for match in matches:
+        match["preview_url"] = url_for("receipt_file", receipt_id=match["id"])
+        match["pdf_preview_url"] = (url_for("receipt_pdf_preview", receipt_id=match["id"], page_number=1)
+                                    if match["mime_type"] == "application/pdf" else None)
     page_count = row["pdf_pages"]
     pdf_preview_url = None
     if row["mime_type"] == "application/pdf":
@@ -165,7 +183,8 @@ def receipt_data(row, expense_id):
                 scan_status=row["scan_status"], scan_error=row["scan_error"], duplicate_of=row["duplicate_of"],
                 created_at=row["created_at"], preview_url=url_for("receipt_file", receipt_id=row["id"]),
                 page_count=page_count, pdf_preview_url=pdf_preview_url,
-                extracted=extraction.get("source_draft"), uncertainty=extraction.get("uncertainty", []))
+                extracted=extraction.get("source_draft"), uncertainty=extraction.get("uncertainty", []),
+                comparison=signature.as_dict(), duplicate_matches=matches)
 
 
 def create_app(overrides=None):
@@ -196,6 +215,7 @@ def create_app(overrides=None):
                 app.secret_key = conn.execute("SELECT value FROM app_settings WHERE name = 'session_key'").fetchone()["value"]
             if app.config["DEMO"]:
                 seed(conn, app.config["RECEIPT_DIR"])
+                backfill_demo_identifier(conn)
     register_routes(app)
     return app
 
@@ -233,12 +253,22 @@ def register_routes(app):
     def invalid(error):
         return jsonify(error=str(error)), 400
 
+    @app.errorhandler(FundError)
+    def invalid_fund(error):
+        return jsonify(error=str(error)), error.status
+
     @app.errorhandler(HTTPException)
     def http_error(error):
         message = "The receipt exceeds the 10 MB upload limit." if error.code == 413 else error.description
         return jsonify(error=message), error.code
 
     @app.get("/")
+    def demo_opening():
+        if app.config["DEMO"] and "invite" not in request.args:
+            return redirect(url_for("static", filename="jaipur/index.html"))
+        return index()
+
+    @app.get("/workspace")
     def index():
         return render_template("index.html")
 
@@ -289,9 +319,11 @@ def register_routes(app):
         if not app.config["DEMO"]:
             raise APIError("Demo accounts are unavailable.", 404)
         person = clean(body(), "person", 10)
-        if person not in ("aman", "simran", "karan"):
+        if person not in ("aman", "simran", "karan", "nisha"):
             raise APIError("Choose a demo member.")
         row = db().execute("SELECT id FROM users WHERE email = ?", (person + "@thrive.demo",)).fetchone()
+        if row is None:
+            raise APIError("Demo member unavailable.", 404)
         return jsonify(sign_in(row["id"]))
 
     @app.get("/api/demo/receipt")
@@ -299,8 +331,14 @@ def register_routes(app):
         if not app.config["DEMO"]:
             raise APIError("Demo receipt unavailable.", 404)
         actor()
-        return send_file(BytesIO(installed_sample(app.config["RECEIPT_DIR"])), mimetype="image/png", as_attachment=True,
-                         download_name="campus-kitchen.png")
+        original = installed_sample(app.config["RECEIPT_DIR"])
+        variant = request.args.get("sample")
+        if variant:
+            sample = demo_variants(original).get(variant)
+            if sample is None:
+                raise APIError("Demo receipt unavailable.", 404)
+            return send_file(BytesIO(sample), mimetype="image/png", as_attachment=True, download_name=f"{variant}.png")
+        return send_file(BytesIO(original), mimetype="image/png", as_attachment=True, download_name="campus-kitchen.png")
 
     @app.get("/api/groups")
     def list_groups():
@@ -333,6 +371,27 @@ def register_routes(app):
             )
             return jsonify(group=dict(group), members=members(conn, group_id), expenses=expense_summary(conn, group_id),
                            ledger=group_ledger(conn, group_id), activity=[dict(event) for event in events])
+
+    @app.get("/api/groups/<int:group_id>/fund")
+    def get_fund(group_id):
+        with read_snapshot() as conn:
+            membership(conn, group_id)
+            return jsonify(fund_state(conn, group_id))
+
+    @app.post("/api/groups/<int:group_id>/fund/entries")
+    def add_fund_entry(group_id):
+        data = body()
+        with transaction() as conn:
+            membership(conn, group_id, organizer=True)
+            entry = record_fund_entry(conn, group_id, actor(), data.get("kind"), data.get("member_id"),
+                                      data.get("amount_paise"), data.get("request_key"))
+        return jsonify(entry), 201
+
+    @app.post("/api/groups/<int:group_id>/fund/begin-refunds")
+    def close_fund(group_id):
+        with transaction() as conn:
+            membership(conn, group_id, organizer=True)
+            return jsonify(begin_refunds(conn, group_id))
 
     @app.post("/api/groups/<int:group_id>/invites")
     def create_invite(group_id):
@@ -448,10 +507,38 @@ def register_routes(app):
 
     @app.get("/api/receipts/<int:receipt_id>")
     def get_receipt(receipt_id):
-        conn = db()
-        row = record(conn, "receipts", receipt_id)
-        expense = conn.execute("SELECT id FROM expenses WHERE receipt_id = ?", (receipt_id,)).fetchone()
-        return jsonify(receipt_data(row, expense["id"]))
+        with read_snapshot() as conn:
+            row = record(conn, "receipts", receipt_id)
+            expense = conn.execute("SELECT id FROM expenses WHERE receipt_id = ?", (receipt_id,)).fetchone()
+            return jsonify(receipt_data(conn, row, expense["id"]))
+
+    @app.patch("/api/receipts/<int:receipt_id>/matches/<int:candidate_id>")
+    def review_receipt_match(receipt_id, candidate_id):
+        decision = body().get("decision")
+        if decision not in ("duplicate", "different"):
+            raise APIError("Choose duplicate or separate purchase.")
+        with transaction() as conn:
+            row = record(conn, "receipts", receipt_id)
+            if not 1 <= candidate_id <= 2**53 - 1:
+                raise APIError("Receipt match not found.", 404)
+            signature = Signature.from_extraction(json.loads(row["extraction_json"] or "{}"))
+            matches = receipt_matches(conn, row, signature, candidate_id)
+            if not matches:
+                raise APIError("Receipt match not found.", 404)
+            expense_id = conn.execute("SELECT id FROM expenses WHERE receipt_id = ?", (receipt_id,)).fetchone()["id"]
+            first, second = sorted((receipt_id, candidate_id))
+            result = conn.execute(
+                """INSERT INTO receipt_duplicate_reviews(receipt_id, candidate_id, decision, reviewed_by)
+                   VALUES (?, ?, ?, ?) ON CONFLICT (receipt_id, candidate_id) DO UPDATE SET
+                   decision = excluded.decision, reviewed_by = excluded.reviewed_by, reviewed_at = CURRENT_TIMESTAMP
+                   WHERE receipt_duplicate_reviews.decision <> excluded.decision""",
+                (first, second, decision, actor()),
+            )
+            if result.rowcount:
+                label = "Marked duplicate" if decision == "duplicate" else "Marked separate purchase"
+                audit(conn, row["group_id"], actor(), "receipt_match_reviewed",
+                      f"{label} · {row['filename']} and {matches[0]['filename']}", expense_id)
+            return jsonify(receipt_data(conn, row, expense_id))
 
     @app.get("/api/receipts/<int:receipt_id>/file")
     def receipt_file(receipt_id):
@@ -509,8 +596,9 @@ def register_routes(app):
             )]
             receipt = None
             if expense["receipt_id"]:
-                receipt = receipt_data(conn.execute("SELECT * FROM receipts WHERE id = ?", (expense["receipt_id"],)).fetchone(),
-                                       expense_id)
+                receipt = receipt_data(
+                    conn, conn.execute("SELECT * FROM receipts WHERE id = ?", (expense["receipt_id"],)).fetchone(), expense_id,
+                )
             disputes = [dict(row) for row in conn.execute(
                 """SELECT d.*, u.name AS actor_name, a.name AS resolver_name, i.description AS item_description
                    FROM disputes d JOIN users u ON u.id = d.actor_id LEFT JOIN users a ON a.id = d.resolved_by
@@ -522,10 +610,10 @@ def register_routes(app):
     @app.patch("/api/expenses/<int:expense_id>/draft")
     def save_draft(expense_id):
         data = body()
-        draft = normalize(data.get("draft"))
         with transaction() as conn:
             expense = record(conn, "expenses", expense_id)
             row = expected_draft(conn, expense_id, data)
+            draft = normalize(data.get("draft"), fallback_payer_id=row["payer_id"])
             validate_draft_members(conn, expense["group_id"], draft)
             write_draft(conn, row["id"], draft)
             audit(conn, expense["group_id"], actor(), "draft_updated", draft["merchant"] or "Receipt draft",
@@ -538,8 +626,15 @@ def register_routes(app):
         with read_snapshot() as conn:
             expense = record(conn, "expenses", expense_id)
             row = expected_draft(conn, expense_id, data)
-            draft = normalize(data["draft"]) if "draft" in data else revision(conn, row)
-            return jsonify(preview(draft, active_ids(conn, expense["group_id"])))
+            draft = normalize(data["draft"], fallback_payer_id=row["payer_id"]) if "draft" in data else revision(conn, row)
+            result = preview(draft, active_ids(conn, expense["group_id"]))
+            if not result["issues"]:
+                try:
+                    validate_funding(conn, expense["group_id"], expense["current_revision_id"],
+                                     result["shares"], result["fund_amount_paise"])
+                except FundError as error:
+                    result["issues"].append(dict(field="contributions", message=str(error)))
+            return jsonify(result)
 
     @app.post("/api/expenses/<int:expense_id>/post")
     def post_expense(expense_id):
@@ -555,9 +650,18 @@ def register_routes(app):
                 return jsonify(id=expense_id, revision_id=revision_id, status="posted")
             if expense["current_revision_id"]:
                 membership(conn, expense["group_id"], organizer=True)
+            elif expense["receipt_id"]:
+                match = confirmed_posted_duplicate(conn, expense["receipt_id"])
+                if match:
+                    raise APIError("This receipt was confirmed as a duplicate of a posted expense.", 409,
+                                   related_expense_id=match["id"])
             result = preview(revision(conn, row), active_ids(conn, expense["group_id"]))
             if result["issues"]:
                 raise APIError("Resolve the review issues before posting.", 422, preview=result)
+            if result["fund_amount_paise"] and not expense["current_revision_id"]:
+                membership(conn, expense["group_id"], organizer=True)
+            validate_funding(conn, expense["group_id"], expense["current_revision_id"],
+                             result["shares"], result["fund_amount_paise"])
             post_revision(conn, expense, row, result["shares"], actor())
         return jsonify(id=expense_id, revision_id=revision_id, status="posted")
 

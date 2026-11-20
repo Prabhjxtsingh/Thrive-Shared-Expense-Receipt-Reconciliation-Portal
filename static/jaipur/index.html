@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#141e38">
+  <meta name="description" content="The Jaipur Industrial Visit group expense dashboard in Thrive.">
+  <title>Jaipur Industrial Visit · Thrive</title>
+  <link rel="stylesheet" href="./styles.css">
+  <script src="./dashboard.js" defer></script>
+</head>
+<body>
+  <svg class="icon-library" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+    <symbol id="i-thrive" viewBox="0 0 24 24"><path d="M4 15.5 9 10l4 3.5L20 6.5M15.5 6.5H20V11M5 20h14"/></symbol>
+    <symbol id="i-overview" viewBox="0 0 24 24"><path d="m3 10 9-7 9 7v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 21v-7h6v7"/></symbol>
+    <symbol id="i-expenses" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 9h8m-8 5h5"/></symbol>
+    <symbol id="i-receipt" viewBox="0 0 24 24"><path d="M6 3h12a1 1 0 0 1 1 1v17l-3-2-4 2-4-2-3 2V4a1 1 0 0 1 1-1ZM8.5 8h7m-7 4h7m-7 4h4"/></symbol>
+    <symbol id="i-balances" viewBox="0 0 24 24"><path d="M4 20V9m5 11V4m6 16v-8m5 8V7"/></symbol>
+    <symbol id="i-wallet" viewBox="0 0 24 24"><path d="M20 9V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3M4 8h15a2 2 0 0 1 2 2v4a1 1 0 0 1-1 1h-5a2 2 0 0 1 0-4h6m-6 2h.01"/></symbol>
+    <symbol id="i-members" viewBox="0 0 24 24"><circle cx="9" cy="7" r="3"/><path d="M3 20v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2m1-16a3 3 0 0 1 0 6m2 4a4 4 0 0 1 3 4v2"/></symbol>
+    <symbol id="i-settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M4.5 10a7.5 7.5 0 0 1 1-2.3l-1-1.8 1.4-1.4 1.8 1a7.5 7.5 0 0 1 2.3-1l.6-2h2.8l.6 2a7.5 7.5 0 0 1 2.3 1l1.8-1 1.4 1.4-1 1.8a7.5 7.5 0 0 1 1 2.3l2 .6v2.8l-2 .6a7.5 7.5 0 0 1-1 2.3l1 1.8-1.4 1.4-1.8-1a7.5 7.5 0 0 1-2.3 1l-.6 2h-2.8l-.6-2a7.5 7.5 0 0 1-2.3-1l-1.8 1-1.4-1.4 1-1.8a7.5 7.5 0 0 1-1-2.3l-2-.6v-2.8z"/></symbol>
+    <symbol id="i-logout" viewBox="0 0 24 24"><path d="M11 4H5v16h6m5-12 4 4-4 4m-6-4h10"/></symbol>
+    <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M7 3v5m10-5v5M3 11h18m-13 4h.01m4 0h.01m4 0h.01"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.8" cy="10.8" r="6.4"/><path d="m16 16 4 4"/></symbol>
+    <symbol id="i-bell" viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0v5l-2 3h16l-2-3zM10 20h4"/></symbol>
+    <symbol id="i-bus" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="16" rx="4"/><path d="M4 12h16M7.5 15.5h.01m9 0h.01M7 19v2m10-2v2"/></symbol>
+    <symbol id="i-food" viewBox="0 0 24 24"><path d="M5 3v6a3 3 0 0 0 6 0V3M8 3v18m10 0V3c-2 2-3 5-3 8v2h3"/></symbol>
+    <symbol id="i-cup" viewBox="0 0 24 24"><path d="M4 8h13v5a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5zm13 1h2a2 2 0 0 1 0 4h-2M3 21h17M7 3v2m4-2v2m4-2v2"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 4 4 10-10"/></symbol>
+    <symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 16V4m-4 4 4-4 4 4M4 15v4a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-4"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
+    <symbol id="i-dot" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4" fill="currentColor" stroke="none"/></symbol>
+  </svg>
+
+  <div class="dashboard-shell">
+    <aside class="sidebar" aria-label="Workspace navigation">
+      <a class="wordmark" href="#overview"><svg class="brand-mark icon"><use href="#i-thrive"/></svg>Thrive</a>
+      <nav class="nav-list" aria-label="Workspace">
+        <button type="button" data-nav="overview" aria-current="page"><span class="nav-icon"><svg class="icon"><use href="#i-overview"/></svg></span><span class="nav-label">Overview</span></button>
+        <button type="button" data-nav="expenses"><span class="nav-icon"><svg class="icon"><use href="#i-expenses"/></svg></span><span class="nav-label">Expenses</span></button>
+        <button type="button" data-nav="receipts"><span class="nav-icon"><svg class="icon"><use href="#i-receipt"/></svg></span><span class="nav-label">Receipts</span></button>
+        <button type="button" data-nav="balances"><span class="nav-icon"><svg class="icon"><use href="#i-balances"/></svg></span><span class="nav-label">Balances</span></button>
+        <button type="button" data-nav="fund"><span class="nav-icon"><svg class="icon"><use href="#i-wallet"/></svg></span><span class="nav-label">Trip fund</span></button>
+        <button type="button" data-nav="members"><span class="nav-icon"><svg class="icon"><use href="#i-members"/></svg></span><span class="nav-label">Members</span></button>
+      </nav>
+      <div class="sidebar-bottom nav-list">
+        <button type="button" data-action="settings"><span class="nav-icon"><svg class="icon"><use href="#i-settings"/></svg></span><span class="nav-label">Settings</span></button>
+        <button type="button" data-action="logout"><span class="nav-icon"><svg class="icon"><use href="#i-logout"/></svg></span><span class="nav-label">Log out</span></button>
+      </div>
+    </aside>
+
+    <main class="workspace" id="overview">
+      <header class="topbar">
+        <div class="breadcrumbs" aria-label="Current group and date">
+          <span class="crumb-section"><svg class="icon"><use href="#i-members"/></svg> Groups</span>
+          <span class="crumb-divider" aria-hidden="true">/</span>
+          <span class="crumb-current">Jaipur visit</span>
+          <span class="crumb-divider date-divider" aria-hidden="true">/</span>
+          <time class="workspace-date" datetime="2026-11-18"><svg class="icon"><use href="#i-calendar"/></svg>18 Nov 2026</time>
+        </div>
+        <div class="topbar-actions">
+          <div class="member-control">
+            <span class="avatar-stack" aria-label="Aman, Simran, and Karan">
+              <span class="avatar avatar-aman">A</span><span class="avatar avatar-simran">S</span><span class="avatar avatar-karan">K</span>
+            </span>
+            <button class="add-member" type="button" data-action="add-member" aria-label="Add member"><span class="add-member-icon"><svg class="icon"><use href="#i-plus"/></svg></span><span class="add-member-label">Add member</span></button>
+          </div>
+          <button class="round-button" type="button" data-action="search" aria-label="Search expenses"><svg class="icon"><use href="#i-search"/></svg></button>
+          <button class="round-button notice-button" type="button" data-action="notifications" aria-label="Notifications"><svg class="icon"><use href="#i-bell"/></svg></button>
+          <button class="avatar profile-button avatar-aman" type="button" data-action="profile" aria-label="Aman’s profile">A</button>
+        </div>
+      </header>
+
+      <div class="workspace-grid">
+        <section class="group-header" aria-labelledby="group-title">
+          <h1 id="group-title"><span>Jaipur</span> Industrial Visit</h1>
+          <p id="group-summary">Shared expenses for 3 members.</p>
+          <div class="group-toolbar">
+            <div class="filters" role="group" aria-label="Filter expenses">
+              <button class="filter-pill is-active" type="button" data-filter="all" aria-pressed="true"><span class="filter-dot all-dot"></span>All expenses</button>
+              <button class="filter-pill" type="button" data-filter="review" aria-pressed="false"><span class="filter-dot review-dot"></span>Needs review</button>
+              <button class="filter-pill" type="button" data-filter="settled" aria-pressed="false"><span class="filter-dot settled-dot"></span>Settled</button>
+            </div>
+            <button class="pill-button add-expense" type="button" data-action="add-expense"><svg class="icon"><use href="#i-plus"/></svg> Add expense</button>
+          </div>
+        </section>
+
+        <aside class="panel review-card" aria-labelledby="review-card-title">
+          <div class="review-card-head"><h2 id="review-card-title">Receipt to review</h2><button class="round-button" type="button" data-action="review" aria-label="Open pending receipt"><svg class="icon"><use href="#i-receipt"/></svg></button></div>
+          <p>The Campus Kitchen</p>
+          <div class="review-card-foot"><span class="status status-review"><span></span>Needs review</span><strong class="amount">₹40 difference</strong></div>
+        </aside>
+
+        <section class="expense-feed" id="expense-feed" aria-label="Group expenses" tabindex="-1">
+          <article class="expense-row" data-expense="transport" data-status="settled" data-amount="3200" data-merchant="Jaipur City Coaches" data-payer="Trip fund" data-category="Transport">
+            <button type="button" class="expense-hit" data-select="transport" aria-label="Select Transport booking" aria-pressed="false"></button>
+            <div class="expense-row-top"><span class="expense-meta"><span class="filter-dot settled-dot"></span><time datetime="2026-11-16">16 Nov</time><span>·</span> Transport</span><span class="status status-settled"><svg class="icon"><use href="#i-check"/></svg>Settled</span></div>
+            <div class="expense-main">
+              <span class="expense-symbol symbol-transport"><svg class="icon"><use href="#i-bus"/></svg></span>
+              <div class="expense-title"><h3>Transport booking</h3><p>Coach transfer for the industrial visit</p></div>
+              <strong class="expense-amount amount">₹3,200.00</strong>
+            </div>
+            <div class="expense-tail"><span><svg class="icon"><use href="#i-wallet"/></svg>Paid from trip fund</span><span class="expense-people"><span class="avatar-stack small-avatars" aria-hidden="true"><span class="avatar avatar-aman">A</span><span class="avatar avatar-simran">S</span><span class="avatar avatar-karan">K</span></span>3 members</span></div>
+            <div class="expense-selected-details"><p>Paid from the collected group advances.</p><button class="pill-button secondary-button" type="button" data-action="review" data-receipt="transport">View expense</button></div>
+          </article>
+
+          <article class="expense-row is-selected" data-expense="dinner" data-status="review" data-amount="840" data-merchant="The Campus Kitchen" data-payer="Aman and Simran" data-category="Food">
+            <button type="button" class="expense-hit" data-select="dinner" aria-label="Select Group dinner" aria-pressed="true"></button>
+            <div class="expense-row-top"><span class="expense-meta"><span class="filter-dot all-dot"></span><time datetime="2026-11-17">17 Nov</time><span>·</span> Food</span><span class="status status-review"><span></span>Needs review</span></div>
+            <div class="expense-main">
+              <span class="expense-symbol symbol-dinner"><svg class="icon"><use href="#i-food"/></svg></span>
+              <div class="expense-title"><h3>Group dinner</h3><p>The Campus Kitchen · Item-wise split</p></div>
+              <strong class="expense-amount amount">₹840.00</strong>
+            </div>
+            <div class="expense-tail"><span><svg class="icon"><use href="#i-wallet"/></svg>Paid by Aman and Simran</span><span class="expense-people"><span class="avatar-stack small-avatars" aria-hidden="true"><span class="avatar avatar-aman">A</span><span class="avatar avatar-simran">S</span><span class="avatar avatar-karan">K</span></span>3 members</span></div>
+            <div class="expense-selected-details"><p><span class="amount">₹40 difference</span> on the scanned total</p><button class="pill-button review-expense" type="button" data-action="review" data-receipt="dinner"><svg class="icon"><use href="#i-receipt"/></svg>Review receipt</button></div>
+          </article>
+
+          <article class="expense-row" data-expense="refreshments" data-status="settled" data-amount="450" data-merchant="Station Café" data-payer="Karan" data-category="Food">
+            <button type="button" class="expense-hit" data-select="refreshments" aria-label="Select Refreshments" aria-pressed="false"></button>
+            <div class="expense-row-top"><span class="expense-meta"><span class="filter-dot settled-dot"></span><time datetime="2026-11-18">18 Nov</time><span>·</span> Food</span><span class="status status-settled"><svg class="icon"><use href="#i-check"/></svg>Settled</span></div>
+            <div class="expense-main">
+              <span class="expense-symbol symbol-refreshments"><svg class="icon"><use href="#i-cup"/></svg></span>
+              <div class="expense-title"><h3>Refreshments</h3><p>Tea and snacks on the return trip</p></div>
+              <strong class="expense-amount amount">₹450.00</strong>
+            </div>
+            <div class="expense-tail"><span><svg class="icon"><use href="#i-wallet"/></svg>Paid by Karan</span><span class="expense-people"><span class="avatar-stack small-avatars" aria-hidden="true"><span class="avatar avatar-aman">A</span><span class="avatar avatar-simran">S</span><span class="avatar avatar-karan">K</span></span>3 members</span></div>
+            <div class="expense-selected-details"><p>Split equally among the three members.</p><button class="pill-button secondary-button" type="button" data-action="review" data-receipt="refreshments">View expense</button></div>
+          </article>
+          <p class="feed-empty" id="feed-empty" hidden>No expenses match this filter.</p>
+        </section>
+
+        <aside class="panel inbox-card" id="receipt-inbox" tabindex="-1" aria-labelledby="inbox-title">
+          <h2 id="inbox-title">Receipt inbox</h2>
+          <p>1 receipt awaiting review</p>
+          <button class="inbox-preview" type="button" data-action="review" aria-label="Preview The Campus Kitchen receipt">
+            <span class="paper-shadow" aria-hidden="true"></span>
+            <span class="paper paper-mini" aria-hidden="true">
+              <strong>Campus Kitchen</strong><small>17 NOV 2026 · BILL 026</small>
+              <span class="paper-rule"></span>
+              <span>Margherita pizza <b>400.00</b></span><span>Punjabi thali <b>250.00</b></span><span>Drinks <b>150.00</b></span>
+              <span class="paper-rule"></span><span class="paper-total">Total <b>₹840.00</b></span>
+            </span>
+          </button>
+          <div class="inbox-footer"><span>JPG, PNG, PDF</span><button type="button" class="pill-button secondary-button" data-action="upload-receipt"><svg class="icon"><use href="#i-upload"/></svg>Upload receipt</button></div>
+        </aside>
+
+        <aside class="panel spending-card" aria-labelledby="spending-title">
+          <div class="spending-heading"><h2 id="spending-title">Group spending</h2><span>16–18 Nov</span></div>
+          <strong class="spending-total amount">₹4,490.00</strong>
+          <div class="spending-chart" role="img" aria-label="Group spending, 16 November ₹3,200, 17 November ₹840, 18 November ₹450">
+            <div><span class="chart-bar bar-transport"></span><span>16 Nov</span></div>
+            <div><span class="chart-bar bar-dinner"></span><span>17 Nov</span></div>
+            <div><span class="chart-bar bar-refreshments"></span><span>18 Nov</span></div>
+          </div>
+        </aside>
+      </div>
+    </main>
+  </div>
+
+  <dialog class="receipt-review" id="receipt-review" aria-labelledby="receipt-review-title">
+    <header class="dialog-header">
+      <div><h2 id="receipt-review-title">Review receipt</h2><p>Group dinner · 17 Nov 2026</p></div>
+      <button type="button" class="round-button" data-action="close-review" aria-label="Close receipt review" autofocus><svg class="icon"><use href="#i-close"/></svg></button>
+    </header>
+    <div class="receipt-review-content">
+      <section class="original-panel" aria-label="Original receipt preview">
+        <div class="paper paper-full">
+          <strong>The Campus Kitchen</strong><small>JAIPUR · 17 NOV 2026 · BILL 026</small>
+          <span class="paper-rule"></span>
+          <span>Margherita pizza <b>₹400.00</b></span><span>Punjabi thali <b>₹250.00</b></span><span>Drinks <b>₹150.00</b></span>
+          <span class="paper-rule"></span><span>Subtotal <b>₹800.00</b></span><span>Tax <b>₹40.00</b></span>
+          <span class="paper-rule"></span><span class="paper-total">Printed total <b>₹840.00</b></span>
+        </div>
+      </section>
+      <section class="review-details" aria-label="Extracted amounts">
+        <div class="review-difference"><span class="status status-review"><span></span>Needs review</span><strong class="amount">₹40 difference</strong><p>The scan captured the item subtotal. The original receipt shows ₹40 tax.</p></div>
+        <h3>Receipt totals</h3>
+        <dl class="review-facts"><div><dt>Scanned total</dt><dd class="amount">₹800.00</dd></div><div><dt>Printed total</dt><dd class="amount">₹840.00</dd></div></dl>
+        <h3>Payer contributions</h3>
+        <dl class="review-facts"><div><dt>Aman · Cash</dt><dd class="amount">₹500.00</dd></div><div><dt>Simran · UPI</dt><dd class="amount">₹340.00</dd></div></dl>
+      </section>
+    </div>
+  </dialog>
+
+  <dialog class="tool-dialog" id="dashboard-tool" aria-labelledby="tool-title">
+    <header class="dialog-header"><h2 id="tool-title"></h2><button type="button" class="round-button" data-action="close-tool" aria-label="Close panel"><svg class="icon"><use href="#i-close"/></svg></button></header>
+    <div id="tool-content"></div>
+  </dialog>
+  <p class="dashboard-status" id="dashboard-status" role="status" aria-live="polite" hidden></p>
+</body>
+</html>

@@ -2,7 +2,6 @@
 
 from datetime import date
 from decimal import Decimal
-from hashlib import sha256
 from io import BytesIO
 import json
 from math import isfinite
@@ -231,10 +230,12 @@ def process_next():
 
     try:
         content = (current_app.config["RECEIPT_DIR"] / row["file_key"]).read_bytes()
-        from demo import installed_sample, azure_fixture
-        if current_app.config["DEMO"] and row["file_hash"] == sha256(installed_sample(current_app.config["RECEIPT_DIR"])).hexdigest():
-            result = azure_fixture()
-        else:
+        result = None
+        if current_app.config["DEMO"]:
+            from demo import installed_sample
+            from demo_receipts import demo_extraction
+            result = demo_extraction(installed_sample(current_app.config["RECEIPT_DIR"]), row["file_hash"])
+        if result is None:
             result = scan_with_azure(content, row["mime_type"], current_app.config["AZURE_ENDPOINT"],
                                      current_app.config["AZURE_KEY"])
         draft, uncertainty = normalize_extraction(result, row["uploader_id"], group_members)

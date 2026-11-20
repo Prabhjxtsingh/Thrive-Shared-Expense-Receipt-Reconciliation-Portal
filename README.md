@@ -1,6 +1,6 @@
 # Thrive Shared Expense & Receipt Reconciliation Portal
 
-Thrive turns a group receipt into reviewed member shares and a ledger of confirmed payments. It supports INR, one payer per expense, and manually recorded payments.
+Thrive turns a group receipt into reviewed member shares and a ledger of confirmed payments. It supports INR, multiple payer contributions per expense, trip advances and refunds, and manual payment recording.
 
 ## Run locally
 
@@ -11,7 +11,15 @@ python -m pip install -r requirements.txt
 python app.py --demo
 ```
 
-Open [Thrive on localhost](http://127.0.0.1:5050). The demo opens as Aman Sharma and uses fictional data in `instance/demo`. Run `python app.py` for a separate workspace with account registration. Use `--port 5051` if port 5050 is taken.
+Open [Thrive on localhost](http://127.0.0.1:5050) for the Jaipur Industrial Visit opening view. You can also open `static/jaipur/index.html` directly. The opening view uses sample data and runs without a server.
+
+The [ledger workspace](http://127.0.0.1:5050/workspace) opens as Aman Sharma in demo mode and uses fictional data in `instance/demo`. Run `python app.py` for a separate workspace with account registration. Use `--port 5051` if port 5050 is taken.
+
+### Opening view artwork
+
+The built-in ImageGen tool created the fictional member portraits in `static/jaipur/member-portraits.png`.
+
+> Create a single landscape photographic avatar contact sheet for a college-trip finance dashboard. Three equal-width adjacent portrait panels, with each face centered precisely in its panel at the same height, eyes slightly above the vertical midpoint. Left: fictional Indian male college student age 21, short wavy dark hair, navy shirt, warm tan blurred background. Center: fictional Indian female college student age 21, long dark hair, muted green shirt, softly blurred sage background. Right: fictional Indian male college student age 21, tidy cropped dark hair, russet shirt, warm muted rose background. Friendly relaxed expressions, natural editorial photography with believable skin and flattering daylight. Draw no borders or gaps between panels. Each face should remain readable in a circular profile crop centered at 50% height. No lettering, grids, logos or overlay graphics.
 
 ## Three-person demo
 
@@ -21,9 +29,31 @@ Open [Thrive on localhost](http://127.0.0.1:5050). The demo opens as Aman Sharma
 4. Reopen the expense, ask a question about **Drinks**, and propose a correction. Remove Karan from the drinks assignment. Compare the proposed shares with the posted shares. As Aman, approve the correction and resolve the question. Revision history and the confirmed payment remain visible.
 5. To demonstrate receipt processing, download the sample from the **Upload receipt** dialog and upload it. The demo worker fills the new draft from a saved extraction response. The existing sample triggers a duplicate warning. Assign the items and remove the tax adjustment to expose the ₹40.00 difference, then add the tax back. Use a separate group if you also want to post the new draft.
 
+## Jaipur trip demo
+
+1. Select **Jaipur Trip** in the workspace picker and open **Trip fund**. Aman, Simran, Karan, and Nisha each advanced ₹1,000. The ₹3,200 coach expense leaves ₹800 in the fund and allocates ₹800 of transport to each member.
+2. Open **The Campus Kitchen** under **Expenses**. Aman contributed ₹500 in cash and Simran paid ₹340 by UPI. The member shares are ₹262.50, ₹262.50, and ₹315.00. The separate personal balances are +₹237.50 for Aman, +₹77.50 for Simran, and −₹315.00 for Karan.
+3. Return to **Trip fund**. As Aman, select **Begin refunds** and confirm. Record a ₹200 refund for each member. The fund closes automatically after the last refund. The dinner balances remain on **Balances**.
+
+On a new expense, **Add payer** lets you enter each amount and payment method. A sole payer can leave its amount blank to cover the bill total. An organizer can post a **Trip fund** contribution, including a bill partially paid from personal money. Thrive allocates the fund-paid portion proportionally across the assigned shares and uses the remaining shares for personal settlements.
+
+## Rehearse duplicate review
+
+In **Industrial Visit ’26**, open **Upload receipt** and expand **Demo receipt samples**. Upload **Second photo of the same bill** to compare it with the seeded dinner receipt. The **Possible duplicate receipts** section explains the match and shows both originals. A reviewer can mark the new upload as a duplicate or as a separate purchase. Confirming a duplicate blocks a second ledger posting when its counterpart is already posted.
+
+The matching tests compare saved extraction responses in three isolated pairs.
+
+| Pair | Expected classification | Detector result |
+| --- | --- | --- |
+| Original versus a different photo of the same receipt | Duplicate | Flagged |
+| Original versus a separate purchase with the same merchant, date, and total | Separate purchase | Unflagged because the printed numbers differ |
+| Original versus a cropped photo with no receipt number | Duplicate | Flagged with item corroboration |
+
+The fixtures detected 2 of 2 duplicates and flagged 0 of 1 separate purchases. This measures the matching rules on synthetic photos with saved extraction fields. Real-world accuracy depends on the OCR and needs evaluation on labeled photos.
+
 ## Runtime and storage
 
-- Flask serves the UI and API. SQLite stores group memberships, draft versions, posted shares, confirmed payments, and audit events.
+- Flask serves the UI and API. SQLite stores group memberships, versioned payer contributions, posted shares, trip fund transactions, duplicate decisions, and audit events. Existing single-payer expenses migrate to a contribution from the original payer.
 - Receipt originals are written under `instance/` and served through group-authorized routes. Uploads accept up to 10 MB of JPEG, PNG, or PDF. PDFium renders private page images for side-by-side review. The queue persists in SQLite, and expired job leases can be reclaimed.
 - `reconciliation.py` validates totals and calculates shares in integer paise. `ledger.py` projects balances from the current posted revision and confirmed settlements. `receipt_extraction.py` normalizes the model response and retains the extracted values for review.
 - Running `python app.py` starts the web process and receipt worker together. With a WSGI host, use `app:create_app()` and run `flask --app app worker` against the same writable instance directory. For HTTPS, configure `THRIVE_SECRET_KEY` and `THRIVE_HTTPS=1`.
@@ -38,6 +68,7 @@ Set `DOCUMENTINTELLIGENCE_ENDPOINT` and `DOCUMENTINTELLIGENCE_API_KEY` in the ba
 python -m unittest discover -s tests -v
 python -m pip install -r requirements-dev.txt
 python -m playwright install chromium
+python tests/jaipur_browser.py
 python tests/browser_smoke.py
 python evaluate_extraction.py fixtures/evaluation.jsonl
 ```

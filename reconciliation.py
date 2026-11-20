@@ -6,6 +6,7 @@ import re
 
 
 MAX_PAISE = 100_000_000_000
+PAYMENT_METHODS = ("", "cash", "upi", "bank", "card", "other")
 
 
 def parse_paise(value):
@@ -23,10 +24,11 @@ def parse_paise(value):
 
 def blank_draft(payer_id):
     return dict(merchant="", purchase_date="", payer_id=payer_id, total_paise=None,
-                subtotal_paise=None, mode="equal", member_ids=[], items=[], adjustments=[])
+                subtotal_paise=None, mode="equal", member_ids=[], items=[], adjustments=[],
+                contributions=[dict(member_id=payer_id, amount_paise=None, method="")])
 
 
-def normalize(data):
+def normalize(data, *, fallback_payer_id=None):
     """Validate the shape of a partial draft, leaving accounting checks to preview."""
     if not isinstance(data, dict):
         raise ValueError("Provide the receipt fields as an object.")
@@ -56,7 +58,28 @@ def normalize(data):
     def members(values):
         return sorted({member(value) for value in rows(values, 100)})
 
-    draft = blank_draft(member(data.get("payer_id")))
+    contributions = None
+    if "contributions" in data:
+        contributions = []
+        for payment in rows(data["contributions"], 50):
+            if not isinstance(payment, dict) or "member_id" not in payment:
+                raise ValueError("Choose a group member or the trip fund for each contribution.")
+            payer = payment["member_id"]
+            if payer is not None:
+                payer = member(payer)
+            method = payment.get("method", "")
+            if method not in PAYMENT_METHODS or (payer is None and method):
+                raise ValueError("Choose a valid payment method for each personal contribution.")
+            contributions.append(dict(member_id=payer, amount_paise=number(payment.get("amount_paise"), optional=True),
+                                      method=method))
+        # Keep an owner on legacy revision records, including bills paid entirely from the fund.
+        payer_id = next((payment["member_id"] for payment in contributions if payment["member_id"] is not None),
+                        fallback_payer_id or data.get("payer_id"))
+    else:
+        payer_id = data.get("payer_id", fallback_payer_id)
+    draft = blank_draft(member(payer_id))
+    if contributions is not None:
+        draft["contributions"] = contributions
     draft["merchant"] = label(data.get("merchant", ""), 160)
     draft["purchase_date"] = label(data.get("purchase_date", ""), 10)
     if draft["purchase_date"]:
@@ -125,11 +148,38 @@ def preview(draft, active_members):
         issue("merchant", "Enter the merchant name.")
     if not draft["purchase_date"]:
         issue("purchase_date", "Enter the purchase date.")
-    if draft["payer_id"] not in active_members:
-        issue("payer_id", "Choose a payer who is a member of this group.")
     total = draft["total_paise"]
     if total is None or total <= 0:
         issue("total_paise", "Enter a receipt total greater than zero.")
+
+    contributions = draft.get("contributions", [dict(member_id=draft["payer_id"], amount_paise=None, method="")])
+    if not contributions:
+        issue("contributions", "Add at least one payer or the trip fund.")
+    contribution_total = 0
+    fund_amount = 0
+    fund_rows = 0
+    resolved = []
+    for index, contribution in enumerate(contributions):
+        path = f"contributions.{index}"
+        payer = contribution["member_id"]
+        amount = contribution["amount_paise"]
+        if amount is None and len(contributions) == 1:
+            amount = total
+        if amount is None or amount <= 0:
+            issue(f"{path}.amount_paise", "Enter a positive contribution.")
+        else:
+            contribution_total += amount
+        if payer is None:
+            fund_rows += 1
+            fund_amount += amount or 0
+            if fund_rows > 1:
+                issue(f"{path}.member_id", "Use one contribution row for the trip fund.")
+        elif payer not in active_members:
+            issue(f"{path}.member_id", "Choose a payer who is an active group member.")
+        resolved.append(dict(contribution, amount_paise=amount))
+    funding_difference = None if total is None else total - contribution_total
+    if funding_difference:
+        issue("contributions", "Payer contributions must add up to the receipt total.")
 
     items = draft["items"]
     item_split = draft["mode"] == "items"
@@ -200,10 +250,14 @@ def preview(draft, active_members):
             shares = equal_split(total, people) if total is not None else {}
     if any(share < 0 for share in shares.values()):
         issue("adjustments", "Adjustments cannot make a member’s share negative.")
-    if not issues and sum(shares.values()) != total:
+    if total is not None and sum(shares.values()) != total and not any(
+        entry["field"].startswith(("items", "adjustments", "member_ids")) for entry in issues
+    ):
         issue("shares", "The assigned shares do not match the receipt total.")
     return dict(issues=issues, subtotal_paise=subtotal, adjustment_paise=adjustment_total,
                 reconstructed_paise=reconstructed, difference_paise=difference, shares=shares,
+                contributions=resolved, contribution_total_paise=contribution_total,
+                contribution_difference_paise=funding_difference, fund_amount_paise=fund_amount,
                 item_subtotals=item_shares, adjustment_shares=adjustment_shares,
                 item_rounding=item_rounding, adjustment_rounding=adjustment_rounding,
                 rounding_recipients=([member for member, share in shares.items()

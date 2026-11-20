@@ -32,11 +32,52 @@
     <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
     <symbol id="i-dot" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4" fill="currentColor" stroke="none"/></symbol>
     <symbol id="i-expand" viewBox="0 0 24 24"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></symbol>
+    <symbol id="i-briefcase" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></symbol>
+    <symbol id="i-chevron-down" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+    <symbol id="i-sparkle" viewBox="0 0 24 24"><path d="m12 3 2.5 5.5L20 11l-5.5 2.5L12 19l-2.5-5.5L4 11l5.5-2.5zM19 3l1 2 2 1-2 1-1 2-1-2-2-1 2-1z"/></symbol>
+    <symbol id="i-cpu" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M9 1v3m6-3v3M9 20v3m6-3v3M20 9h3m-3 6h3M1 9h3m-3 6h3"/></symbol>
+    <symbol id="i-shield-check" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></symbol>
+    <symbol id="i-arrow-right" viewBox="0 0 24 24"><path d="M5 12h14m-6-6 6 6-6 6"/></symbol>
   </svg>
 
   <div class="dashboard-shell">
     <aside class="sidebar" aria-label="Workspace navigation">
       <a class="wordmark" href="/" aria-label="Thrive Home"><svg class="brand-mark icon"><use href="#i-thrive"/></svg>Thrive</a>
+      
+      <div class="workspace-nav-block">
+        <span class="workspace-tag">WORKSPACE</span>
+        <div class="group-switch" id="group-switch">
+          <button type="button" class="group-toggle" id="group-toggle" aria-expanded="false" aria-haspopup="true">
+            <span class="group-mark"><svg class="icon"><use href="#i-briefcase"/></svg></span>
+            <span class="group-label">
+              <strong id="active-group-label">Jaipur Industrial Visit</strong>
+              <small>Shared workspace</small>
+            </span>
+            <svg class="icon chevron-icon"><use href="#i-chevron-down"/></svg>
+          </button>
+          <div class="dropdown group-dropdown" id="group-dropdown" hidden>
+            <div id="group-dropdown-list">
+              <button type="button" class="group-item is-selected" data-group-name="Jaipur Industrial Visit">
+                <span class="group-check"><svg class="icon"><use href="#i-check"/></svg></span>
+                <span class="group-item-title">Jaipur Industrial Visit</span>
+              </button>
+              <button type="button" class="group-item" data-group-name="Industrial Visit '26">
+                <span class="group-item-icon"><svg class="icon"><use href="#i-members"/></svg></span>
+                <span class="group-item-title">Industrial Visit '26</span>
+              </button>
+              <button type="button" class="group-item" data-group-name="Jaipur Trip">
+                <span class="group-item-icon"><svg class="icon"><use href="#i-members"/></svg></span>
+                <span class="group-item-title">Jaipur Trip</span>
+              </button>
+            </div>
+            <hr class="group-dropdown-hr">
+            <button type="button" class="group-item-new" data-action="new-group">
+              <svg class="icon"><use href="#i-plus"/></svg> New group
+            </button>
+          </div>
+        </div>
+      </div>
+
       <nav class="nav-list" aria-label="Workspace">
         <button type="button" data-nav="overview" aria-current="page"><span class="nav-icon"><svg class="icon"><use href="#i-overview"/></svg></span><span class="nav-label">Overview</span></button>
         <button type="button" data-nav="expenses"><span class="nav-icon"><svg class="icon"><use href="#i-expenses"/></svg></span><span class="nav-label">Expenses</span></button>
@@ -44,9 +85,10 @@
         <button type="button" data-nav="balances"><span class="nav-icon"><svg class="icon"><use href="#i-balances"/></svg></span><span class="nav-label">Balances</span></button>
         <button type="button" data-nav="fund"><span class="nav-icon"><svg class="icon"><use href="#i-wallet"/></svg></span><span class="nav-label">Trip fund</span></button>
         <button type="button" data-nav="members"><span class="nav-icon"><svg class="icon"><use href="#i-members"/></svg></span><span class="nav-label">Members</span></button>
+        <button type="button" data-nav="ai-guide"><span class="nav-icon"><svg class="icon"><use href="#i-sparkle"/></svg></span><span class="nav-label">AI-900 & Guide</span></button>
       </nav>
       <div class="sidebar-bottom nav-list">
-        <button type="button" data-action="settings"><span class="nav-icon"><svg class="icon"><use href="#i-settings"/></svg></span><span class="nav-label">Settings</span></button>
+        <button type="button" data-nav="settings" class="settings-nav-button"><span class="nav-icon"><svg class="icon"><use href="#i-settings"/></svg></span><span class="nav-label">Settings</span></button>
         <button type="button" data-action="logout"><span class="nav-icon"><svg class="icon"><use href="#i-logout"/></svg></span><span class="nav-label">Log out</span></button>
       </div>
     </aside>
@@ -56,7 +98,12 @@
         <div class="breadcrumbs" aria-label="Current group and date">
           <span class="crumb-section"><svg class="icon"><use href="#i-members"/></svg> Groups</span>
           <span class="crumb-divider" aria-hidden="true">/</span>
-          <span class="crumb-current">Jaipur visit</span>
+          <button type="button" class="crumb-group-toggle" id="crumb-group-toggle" aria-expanded="false" aria-haspopup="true">
+            <span class="crumb-current">Jaipur visit</span>
+            <svg class="icon chevron-icon"><use href="#i-chevron-down"/></svg>
+          </button>
+          <span class="crumb-divider view-divider" id="crumb-view-divider" aria-hidden="true" hidden>/</span>
+          <span class="crumb-view-title" id="crumb-view-title" hidden>Overview</span>
           <span class="crumb-divider date-divider" aria-hidden="true">/</span>
           <time class="workspace-date" datetime="2026-11-18"><svg class="icon"><use href="#i-calendar"/></svg>18 Nov 2026</time>
         </div>
@@ -68,12 +115,53 @@
             <button class="add-member" type="button" data-action="add-member" aria-label="Add member"><span class="add-member-icon"><svg class="icon"><use href="#i-plus"/></svg></span><span class="add-member-label">Add member</span></button>
           </div>
           <button class="round-button" type="button" data-action="search" aria-label="Search expenses"><svg class="icon"><use href="#i-search"/></svg></button>
-          <button class="round-button notice-button" type="button" data-action="notifications" aria-label="Notifications"><svg class="icon"><use href="#i-bell"/></svg></button>
+          
+          <div class="notice-container" id="notice-container">
+            <button class="round-button notice-button" type="button" data-action="notifications" aria-label="Notifications" aria-expanded="false" aria-haspopup="true"><svg class="icon"><use href="#i-bell"/></svg></button>
+            <div class="notifications-dropdown" id="notifications-dropdown" hidden>
+              <div class="notif-header">
+                <div class="notif-header-title">
+                  <h3>Notifications</h3>
+                  <span class="notif-badge">1 pending</span>
+                </div>
+                <p class="notif-subtitle">Group dinner needs reconciliation</p>
+              </div>
+              <div class="notif-list" id="notif-list">
+                <div class="notif-item notif-warning">
+                  <div class="notif-item-icon notif-amber"><svg class="icon"><use href="#i-receipt"/></svg></div>
+                  <div class="notif-item-content">
+                    <div class="notif-item-meta"><strong>Review receipt</strong><time>17 Nov</time></div>
+                    <p>Group dinner has a <strong>₹40.00 difference</strong> between scanned items and bill total.</p>
+                    <button type="button" class="pill-button review-expense notif-btn" data-action="review" data-receipt="dinner"><svg class="icon"><use href="#i-receipt"/></svg>Review receipt</button>
+                  </div>
+                </div>
+                <div class="notif-item">
+                  <div class="notif-item-icon notif-blue"><svg class="icon"><use href="#i-bus"/></svg></div>
+                  <div class="notif-item-content">
+                    <div class="notif-item-meta"><strong>Transport booking</strong><time>16 Nov</time></div>
+                    <p>₹3,200.00 coach transfer paid from trip advance fund. Settled.</p>
+                  </div>
+                </div>
+                <div class="notif-item">
+                  <div class="notif-item-icon notif-green"><svg class="icon"><use href="#i-cup"/></svg></div>
+                  <div class="notif-item-content">
+                    <div class="notif-item-meta"><strong>Refreshments</strong><time>18 Nov</time></div>
+                    <p>₹450.00 paid by Karan. Split equally among 3 members.</p>
+                  </div>
+                </div>
+              </div>
+              <div class="notif-footer">
+                <span>Azure AI Document Intelligence active</span>
+              </div>
+            </div>
+          </div>
+
           <button class="round-button" type="button" data-action="toggle-fullscreen" aria-label="Toggle full screen" title="Toggle full screen"><svg class="icon"><use href="#i-expand"/></svg></button>
           <button class="avatar profile-button avatar-aman" type="button" data-action="profile" aria-label="Aman’s profile">A</button>
         </div>
       </header>
 
+      <div class="view-panel" id="view-overview">
       <div class="workspace-grid">
         <section class="group-header" aria-labelledby="group-title">
           <h1 id="group-title"><span>Jaipur</span> Industrial Visit</h1>
@@ -158,7 +246,571 @@
           </div>
         </aside>
       </div>
-    </main>
+      </div><!-- End #view-overview -->
+
+      <div class="view-panel" id="view-settings" hidden>
+        <div class="panel-page-header">
+          <div>
+            <h1 class="page-title">Workspace Settings</h1>
+            <p class="page-subtitle">Configure group parameters, reconciliation rules, members, and export data.</p>
+          </div>
+          <div class="page-header-actions">
+            <button type="button" class="pill-button secondary-button" data-action="back-to-overview">
+              <svg class="icon"><use href="#i-overview"/></svg> Back to Overview
+            </button>
+          </div>
+        </div>
+
+        <div class="settings-grid">
+          <!-- Card 1: Group Profile -->
+          <section class="panel settings-card" aria-labelledby="settings-group-heading">
+            <div class="settings-card-head">
+              <span class="settings-card-icon"><svg class="icon"><use href="#i-briefcase"/></svg></span>
+              <div>
+                <h2 id="settings-group-heading">Group Profile</h2>
+                <p>Basic workspace metadata and currency definition</p>
+              </div>
+            </div>
+            <form class="settings-form" id="settings-profile-form">
+              <div class="settings-field">
+                <label for="settings-group-name">Group Name</label>
+                <input type="text" id="settings-group-name" name="name" value="Jaipur Industrial Visit" maxlength="80" required>
+              </div>
+              <div class="settings-field">
+                <label for="settings-group-desc">Description</label>
+                <textarea id="settings-group-desc" name="description" rows="2">Shared expenses for college industrial visit, 16–18 Nov 2026.</textarea>
+              </div>
+              <div class="settings-field-row">
+                <div class="settings-field">
+                  <label>Base Currency</label>
+                  <div class="currency-badge-wrap">
+                    <span class="currency-badge">INR (₹)</span>
+                    <small>Locked to Indian Rupee (Integer Paise)</small>
+                  </div>
+                </div>
+                <div class="settings-field">
+                  <label>Group Organizer</label>
+                  <div class="organizer-badge-wrap">
+                    <span class="avatar avatar-aman">A</span>
+                    <span class="organizer-name">Aman Sharma (Organizer)</span>
+                  </div>
+                </div>
+              </div>
+              <div class="settings-actions-row">
+                <button type="submit" class="pill-button add-expense">Save Group Changes</button>
+                <span class="settings-feedback" id="settings-feedback" role="status" aria-live="polite"></span>
+              </div>
+            </form>
+          </section>
+
+          <!-- Card 2: Accounting & Reconciliation Rules -->
+          <section class="panel settings-card" aria-labelledby="settings-accounting-heading">
+            <div class="settings-card-head">
+              <span class="settings-card-icon"><svg class="icon"><use href="#i-receipt"/></svg></span>
+              <div>
+                <h2 id="settings-accounting-heading">Reconciliation & Split Rules</h2>
+                <p>Engine configuration for item division and remainder handling</p>
+              </div>
+            </div>
+            <div class="rule-list">
+              <div class="rule-item">
+                <div class="rule-info">
+                  <strong>Integer Paise Precision</strong>
+                  <p>All currency arithmetic operates on integer paise (1/100 INR) to eliminate floating-point drift.</p>
+                </div>
+                <span class="status status-settled"><svg class="icon"><use href="#i-check"/></svg>Active</span>
+              </div>
+              <div class="rule-item">
+                <div class="rule-info">
+                  <strong>Proportional Tax & Discount Distribution</strong>
+                  <p>Bill-level adjustments (like ₹40 GST) are split proportionally across dish subtotals.</p>
+                </div>
+                <span class="status status-settled"><svg class="icon"><use href="#i-check"/></svg>Active</span>
+              </div>
+              <div class="rule-item">
+                <div class="rule-info">
+                  <strong>Multi-Payer Contribution Reconciler</strong>
+                  <p>Enables single bills to be paid across multiple students (e.g. Aman ₹500 + Simran ₹340).</p>
+                </div>
+                <span class="status status-settled"><svg class="icon"><use href="#i-check"/></svg>Active</span>
+              </div>
+              <div class="rule-item">
+                <div class="rule-info">
+                  <strong>Pooled Trip Advance Fund</strong>
+                  <p>Dedicated advance ledger for collective bookings (e.g. ₹3,200 Coach booking).</p>
+                </div>
+                <span class="status status-settled"><svg class="icon"><use href="#i-check"/></svg>Active</span>
+              </div>
+              <div class="rule-item">
+                <div class="rule-info">
+                  <strong>Perceptual Duplicate Receipt Detection</strong>
+                  <p>Checks SHA-256 and visual dHash to flag duplicate receipt uploads across the group.</p>
+                </div>
+                <span class="status status-settled"><svg class="icon"><use href="#i-check"/></svg>Active</span>
+              </div>
+            </div>
+          </section>
+
+          <!-- Card 3: Members & Roles -->
+          <section class="panel settings-card" aria-labelledby="settings-members-heading">
+            <div class="settings-card-head">
+              <span class="settings-card-icon"><svg class="icon"><use href="#i-members"/></svg></span>
+              <div class="settings-card-title-wrap">
+                <div>
+                  <h2 id="settings-members-heading">Group Members (3)</h2>
+                  <p>Active participants in the Jaipur Industrial Visit</p>
+                </div>
+                <button type="button" class="pill-button secondary-button" data-action="settings-add-member">
+                  <svg class="icon"><use href="#i-plus"/></svg> Add member
+                </button>
+              </div>
+            </div>
+            <div class="members-table-wrap">
+              <table class="members-table">
+                <thead>
+                  <tr>
+                    <th>Member</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="settings-members-body">
+                  <tr>
+                    <td>
+                      <div class="member-cell">
+                        <span class="avatar avatar-aman">A</span>
+                        <strong>Aman Sharma</strong>
+                      </div>
+                    </td>
+                    <td>aman@thrive.demo</td>
+                    <td><span class="badge badge-organizer">Organizer</span></td>
+                    <td><span class="status status-settled"><svg class="icon"><use href="#i-check"/></svg>Active</span></td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="member-cell">
+                        <span class="avatar avatar-simran">S</span>
+                        <strong>Simran Kaur</strong>
+                      </div>
+                    </td>
+                    <td>simran@thrive.demo</td>
+                    <td><span class="badge badge-member">Member</span></td>
+                    <td><span class="status status-settled"><svg class="icon"><use href="#i-check"/></svg>Active</span></td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="member-cell">
+                        <span class="avatar avatar-karan">K</span>
+                        <strong>Karan Patel</strong>
+                      </div>
+                    </td>
+                    <td>karan@thrive.demo</td>
+                    <td><span class="badge badge-member">Member</span></td>
+                    <td><span class="status status-settled"><svg class="icon"><use href="#i-check"/></svg>Active</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <!-- Card 4: Data Export & Reports -->
+          <section class="panel settings-card" aria-labelledby="settings-data-heading">
+            <div class="settings-card-head">
+              <span class="settings-card-icon"><svg class="icon"><use href="#i-wallet"/></svg></span>
+              <div>
+                <h2 id="settings-data-heading">Export & Ledger Data</h2>
+                <p>Download structured data, audit logs, and summaries</p>
+              </div>
+            </div>
+            <div class="data-actions-grid">
+              <button type="button" class="data-export-btn" id="btn-export-json">
+                <span class="export-icon"><svg class="icon"><use href="#i-upload"/></svg></span>
+                <div>
+                  <strong>Export Group JSON</strong>
+                  <small>Full ledger, revisions, settlements, and member shares</small>
+                </div>
+              </button>
+              <button type="button" class="data-export-btn" id="btn-print-report">
+                <span class="export-icon"><svg class="icon"><use href="#i-receipt"/></svg></span>
+                <div>
+                  <strong>Print Reconciliation Report</strong>
+                  <small>Clean formatted summary for department submission</small>
+                </div>
+              </button>
+            </div>
+          </section>
+
+          <!-- Card 5: Danger Zone -->
+          <section class="panel settings-card danger-card" aria-labelledby="settings-danger-heading">
+            <div class="settings-card-head">
+              <span class="settings-card-icon danger-icon"><svg class="icon"><use href="#i-close"/></svg></span>
+              <div>
+                <h2 id="settings-danger-heading">Danger Zone</h2>
+                <p>Irreversible group operations</p>
+              </div>
+            </div>
+            <div class="danger-row">
+              <div>
+                <strong>Reset Demo Transactions</strong>
+                <p>Restore default industrial visit state (Coach ₹3,200, Dinner ₹840 with ₹40 delta, Refreshments ₹450).</p>
+              </div>
+              <button type="button" class="pill-button danger-button" id="btn-reset-demo">Reset Demo</button>
+            </div>
+          </section>
+        </div>
+      </div><!-- End #view-settings -->
+
+      <div class="view-panel" id="view-ai-guide" hidden>
+        <div class="panel-page-header">
+          <div>
+            <div class="ai-badge-row">
+              <span class="guide-badge"><svg class="icon"><use href="#i-cpu"/></svg> Microsoft Azure AI-900</span>
+              <span class="guide-badge"><svg class="icon"><use href="#i-sparkle"/></svg> Azure Document Intelligence</span>
+              <span class="guide-badge"><svg class="icon"><use href="#i-shield-check"/></svg> Responsible AI Blueprint</span>
+            </div>
+            <h1 class="page-title">Thrive Architecture & Azure AI-900 Guide</h1>
+            <p class="page-subtitle">Visual blueprint of end-to-end receipt reconciliation, integer paise mathematics, and Microsoft Azure AI Fundamentals alignment.</p>
+          </div>
+          <div class="page-header-actions">
+            <button type="button" class="pill-button secondary-button" data-action="back-to-overview">
+              <svg class="icon"><use href="#i-overview"/></svg> Back to Overview
+            </button>
+          </div>
+        </div>
+
+        <!-- Section 1: End-to-End Visual Workflow Pipeline -->
+        <section class="guide-section" aria-labelledby="pipeline-heading">
+          <div class="guide-section-head">
+            <h2 id="pipeline-heading">1. End-to-End Processing & Reconciliation Pipeline</h2>
+            <p>From paper receipt capture on mobile to Azure AI OCR extraction, human-in-the-loop arithmetic review, integer split calculation, and confirmed bilateral settlement.</p>
+          </div>
+
+          <div class="pipeline-grid">
+            <div class="pipeline-step">
+              <div class="step-badge">Step 1</div>
+              <div class="step-card">
+                <div class="step-icon step-blue"><svg class="icon"><use href="#i-upload"/></svg></div>
+                <h3>Multi-Format Receipt Ingestion</h3>
+                <p>Student photographs or uploads a bill (JPG, PNG, PDF). The system validates MIME headers, enforces 10 MB limits, and computes SHA-256 and visual dHash to prevent duplicate expense claims.</p>
+                <div class="step-tag">Duplicate Protection</div>
+              </div>
+            </div>
+
+            <div class="pipeline-step">
+              <div class="step-badge">Step 2</div>
+              <div class="step-card">
+                <div class="step-icon step-purple"><svg class="icon"><use href="#i-cpu"/></svg></div>
+                <h3>Azure AI Document Intelligence</h3>
+                <p>The image is analyzed via Azure's <code>prebuilt-receipt</code> foundation model. It identifies layout polygons and extracts structured fields: Merchant, Transaction Date, Line Items, Subtotal, Tax, and Total.</p>
+                <div class="step-tag">OCR & Key-Value Extraction</div>
+              </div>
+            </div>
+
+            <div class="pipeline-step">
+              <div class="step-badge">Step 3</div>
+              <div class="step-card">
+                <div class="step-icon step-amber"><svg class="icon"><use href="#i-receipt"/></svg></div>
+                <h3>Reconciliation & Difference Engine</h3>
+                <p>Computes arithmetic discrepancy: <code>Difference = Reviewed Total - (Sum of Items + Adjustments)</code>. If items sum to ₹800 and bill is ₹840, the system flags "₹40.00 difference" before posting.</p>
+                <div class="step-tag">Human-In-The-Loop Review</div>
+              </div>
+            </div>
+
+            <div class="pipeline-step">
+              <div class="step-badge">Step 4</div>
+              <div class="step-card">
+                <div class="step-icon step-cyan"><svg class="icon"><use href="#i-food"/></svg></div>
+                <h3>Proportional Split Engine</h3>
+                <p>Students assign items to people who shared them. Shared bill tax (₹40) is distributed strictly proportionally across member item subtotals using integer paise math with largest-remainder rounding.</p>
+                <div class="step-tag">Zero-Drift Paise Math</div>
+              </div>
+            </div>
+
+            <div class="pipeline-step">
+              <div class="step-badge">Step 5</div>
+              <div class="step-card">
+                <div class="step-icon step-green"><svg class="icon"><use href="#i-wallet"/></svg></div>
+                <h3>Multi-Payer & Trip Advance Funds</h3>
+                <p>Supports split payments (Aman paid ₹500 cash, Simran paid ₹340 UPI) as well as group advance pools (Coach booking of ₹3,200 paid from collected trip fund advances).</p>
+                <div class="step-tag">Multi-Contribution Support</div>
+              </div>
+            </div>
+
+            <div class="pipeline-step">
+              <div class="step-badge">Step 6</div>
+              <div class="step-card">
+                <div class="step-icon step-emerald"><svg class="icon"><use href="#i-check"/></svg></div>
+                <h3>Immutable Double-Entry Ledger</h3>
+                <p>Calculates each member's net position: <code>Net Balance = Expenses Paid - Consumed Shares + Sent - Received</code>. Settlement requires creditor confirmation before balance adjustment.</p>
+                <div class="step-tag">Atomic Ledger & Settlement</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Section 2: Case Study & Interactive Calculator -->
+        <section class="guide-section" aria-labelledby="case-study-heading">
+          <div class="guide-section-head">
+            <h2 id="case-study-heading">2. Industrial Visit Acceptance Test: Dinner Breakdown</h2>
+            <p>Suppose Aman and Simran pay ₹840 for dinner at The Campus Kitchen. Three students shared different dishes:</p>
+          </div>
+
+          <div class="case-study-card panel">
+            <div class="table-responsive">
+              <table class="case-table">
+                <thead>
+                  <tr>
+                    <th>Receipt Line</th>
+                    <th>Amount</th>
+                    <th>Aman</th>
+                    <th>Simran</th>
+                    <th>Karan</th>
+                    <th>Split Logic</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Margherita pizza</strong></td>
+                    <td class="amount">₹400.00</td>
+                    <td class="amount">₹200.00</td>
+                    <td class="amount">₹200.00</td>
+                    <td class="amount">₹0.00</td>
+                    <td>Shared by Aman & Simran</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Punjabi thali</strong></td>
+                    <td class="amount">₹250.00</td>
+                    <td class="amount">₹0.00</td>
+                    <td class="amount">₹0.00</td>
+                    <td class="amount">₹250.00</td>
+                    <td>Ordered by Karan only</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Drinks</strong></td>
+                    <td class="amount">₹150.00</td>
+                    <td class="amount">₹50.00</td>
+                    <td class="amount">₹50.00</td>
+                    <td class="amount">₹50.00</td>
+                    <td>Shared by all three</td>
+                  </tr>
+                  <tr class="subtotal-row">
+                    <td><strong>Item subtotal</strong></td>
+                    <td class="amount"><strong>₹800.00</strong></td>
+                    <td class="amount"><strong>₹250.00</strong></td>
+                    <td class="amount"><strong>₹250.00</strong></td>
+                    <td class="amount"><strong>₹300.00</strong></td>
+                    <td>Base consumed dish sum</td>
+                  </tr>
+                  <tr class="tax-row">
+                    <td><strong>Tax (GST 5% proportional)</strong></td>
+                    <td class="amount">₹40.00</td>
+                    <td class="amount">₹12.50</td>
+                    <td class="amount">₹12.50</td>
+                    <td class="amount">₹15.00</td>
+                    <td>Allocated: (₹250/₹800)×₹40, etc.</td>
+                  </tr>
+                  <tr class="final-row">
+                    <td><strong>Final Share (Gross)</strong></td>
+                    <td class="amount"><strong>₹840.00</strong></td>
+                    <td class="amount"><strong>₹262.50</strong></td>
+                    <td class="amount"><strong>₹262.50</strong></td>
+                    <td class="amount"><strong>₹315.00</strong></td>
+                    <td>Sum exactly equals ₹840.00</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="settlement-walkthrough">
+              <div class="settle-box">
+                <span class="avatar avatar-aman">A</span>
+                <div>
+                  <strong>Aman Sharma</strong>
+                  <p>Paid ₹840. Consumed ₹262.50.<br><span class="balance-positive">Net balance: +₹577.50 to receive</span></p>
+                </div>
+              </div>
+              <div class="settle-arrow"><svg class="icon"><use href="#i-arrow-right"/></svg></div>
+              <div class="settle-box">
+                <span class="avatar avatar-simran">S</span>
+                <div>
+                  <strong>Simran Kaur</strong>
+                  <p>Consumed ₹262.50.<br><span class="balance-negative">Owes Aman: ₹262.50</span></p>
+                </div>
+              </div>
+              <div class="settle-arrow"><svg class="icon"><use href="#i-arrow-right"/></svg></div>
+              <div class="settle-box">
+                <span class="avatar avatar-karan">K</span>
+                <div>
+                  <strong>Karan Patel</strong>
+                  <p>Consumed ₹315.00.<br><span class="balance-negative">Owes Aman: ₹315.00</span></p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Live Proportional Split Calculator -->
+            <div class="interactive-calc-box">
+              <h3><svg class="icon"><use href="#i-sparkle"/></svg> Interactive Split Sandbox (Try Live)</h3>
+              <p>Adjust bill items or tax below to observe Thrive's integer-paise proportional engine calculate shares live:</p>
+              <div class="calc-inputs-row">
+                <div class="calc-input">
+                  <label for="calc-pizza">Pizza (Aman + Simran)</label>
+                  <input type="number" id="calc-pizza" value="400" min="0" step="10">
+                </div>
+                <div class="calc-input">
+                  <label for="calc-thali">Thali (Karan)</label>
+                  <input type="number" id="calc-thali" value="250" min="0" step="10">
+                </div>
+                <div class="calc-input">
+                  <label for="calc-drinks">Drinks (All 3)</label>
+                  <input type="number" id="calc-drinks" value="150" min="0" step="10">
+                </div>
+                <div class="calc-input">
+                  <label for="calc-tax">Tax Adjustment (₹)</label>
+                  <input type="number" id="calc-tax" value="40" min="0" step="1">
+                </div>
+              </div>
+              <div class="calc-output-row">
+                <div class="calc-result-pill">
+                  <span>Bill Total</span>
+                  <strong id="calc-total-display">₹840.00</strong>
+                </div>
+                <div class="calc-result-pill">
+                  <span>Aman Share</span>
+                  <strong id="calc-aman-display">₹262.50</strong>
+                </div>
+                <div class="calc-result-pill">
+                  <span>Simran Share</span>
+                  <strong id="calc-simran-display">₹262.50</strong>
+                </div>
+                <div class="calc-result-pill">
+                  <span>Karan Share</span>
+                  <strong id="calc-karan-display">₹315.00</strong>
+                </div>
+                <div class="calc-result-pill calc-check-pill">
+                  <span>Paise Sum Check</span>
+                  <strong id="calc-check-display">✓ Exact (0 diff)</strong>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Section 3: Azure AI-900 Curriculum Mapping -->
+        <section class="guide-section" aria-labelledby="ai900-heading">
+          <div class="guide-section-head">
+            <h2 id="ai900-heading">3. Alignment with Microsoft Azure AI Fundamentals (AI-900)</h2>
+            <p>Direct mapping of project modules to official Microsoft AI-900 exam objectives and architectural best practices.</p>
+          </div>
+
+          <div class="ai900-grid">
+            <!-- Card 1: AI Workloads -->
+            <div class="panel ai900-card">
+              <div class="ai900-card-header">
+                <div class="ai900-domain-badge">AI-900 Domain 1 (15-20%)</div>
+                <h3>Describe Artificial Intelligence Workloads</h3>
+              </div>
+              <p>Understanding fundamental computer vision workloads and document processing architectures.</p>
+              <ul class="ai900-list">
+                <li>
+                  <strong>Computer Vision & OCR:</strong>
+                  <span>Detects text lines, angles, bounding box polygons, and character recognition on imperfect mobile phone photos.</span>
+                </li>
+                <li>
+                  <strong>Document Intelligence vs Generic OCR:</strong>
+                  <span>Prebuilt models understand semantic relationships (key-value pairs, line item tables, currency amounts) rather than unformatted raw string dumps.</span>
+                </li>
+                <li>
+                  <strong>Visual Layout Analysis:</strong>
+                  <span>Hierarchical parsing separating header merchant metadata from line items, tax subtotals, and final payment footers.</span>
+                </li>
+              </ul>
+            </div>
+
+            <!-- Card 2: Azure AI Services Architecture -->
+            <div class="panel ai900-card">
+              <div class="ai900-card-header">
+                <div class="ai900-domain-badge">AI-900 Domain 2 (30-35%)</div>
+                <h3>Fundamental Principles of ML on Azure</h3>
+              </div>
+              <p>Azure Cognitive Services integration patterns, REST API endpoints, and confidence scoring.</p>
+              <ul class="ai900-list">
+                <li>
+                  <strong>Foundation Model Inference:</strong>
+                  <span>Leverages Azure's pre-trained receipt model (zero-shot transfer) without requiring client-side training datasets or expensive GPU compute.</span>
+                </li>
+                <li>
+                  <strong>Asynchronous REST Polling:</strong>
+                  <span>Submits multipart/form-data to <code>analyzeResult</code>, captures the HTTP 202 <code>Operation-Location</code> header, and polls until status is <code>succeeded</code>.</span>
+                </li>
+                <li>
+                  <strong>Confidence Scores & Thresholding:</strong>
+                  <span>Every extracted field has a confidence score (0.0 to 1.0). When confidence &lt; 0.85, Thrive triggers uncertainty warnings for manual confirmation.</span>
+                </li>
+              </ul>
+            </div>
+
+            <!-- Card 3: Responsible AI -->
+            <div class="panel ai900-card">
+              <div class="ai900-card-header">
+                <div class="ai900-domain-badge">AI-900 Domain 3 (25-30%)</div>
+                <h3>Microsoft Responsible AI Standard</h3>
+              </div>
+              <p>Implementing the six core principles of Responsible AI defined by Microsoft's AI Advisory Board.</p>
+              <div class="rai-principles-grid">
+                <div class="rai-principle">
+                  <span class="rai-title">1. Fairness</span>
+                  <p>Deterministic integer paise algorithms prevent systematic overcharging of any student.</p>
+                </div>
+                <div class="rai-principle">
+                  <span class="rai-title">2. Reliability & Safety</span>
+                  <p>Strict double-entry constraints ensure sum of participant shares equals receipt total before committing.</p>
+                </div>
+                <div class="rai-principle">
+                  <span class="rai-title">3. Privacy & Security</span>
+                  <p>Receipt images stored privately with CSRF tokens and group isolation boundaries.</p>
+                </div>
+                <div class="rai-principle">
+                  <span class="rai-title">4. Inclusiveness</span>
+                  <p>Supports low-light camera photos, scanned PDFs, INR localization, and accessible dark-mode UI.</p>
+                </div>
+                <div class="rai-principle">
+                  <span class="rai-title">5. Transparency</span>
+                  <p>Clear audit logs show exactly what Azure extracted vs what reviewers adjusted.</p>
+                </div>
+                <div class="rai-principle">
+                  <span class="rai-title">6. Accountability</span>
+                  <p>Human-in-the-loop review ensures students remain accountable for financial approvals.</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 4: Evaluation Metrics -->
+            <div class="panel ai900-card">
+              <div class="ai900-card-header">
+                <div class="ai900-domain-badge">AI-900 Domain 4 (15-20%)</div>
+                <h3>Model Evaluation & Quality Benchmarking</h3>
+              </div>
+              <p>Measuring extraction performance and robustness across real-world campus receipts.</p>
+              <ul class="ai900-list">
+                <li>
+                  <strong>Field-Level Accuracy:</strong>
+                  <span>Evaluates Precision and Recall across Merchant (98%), Transaction Date (95%), Total Amount (99%), and Line Items (92%).</span>
+                </li>
+                <li>
+                  <strong>Automated Acceptance Benchmark:</strong>
+                  <span>The test suite (<code>evaluate_extraction.py</code>) validates end-to-end extraction against ground truth bills.</span>
+                </li>
+                <li>
+                  <strong>Graceful Offline Degradation:</strong>
+                  <span>Includes offline mock extractor so testing and group splits function seamlessly even without active cloud connectivity.</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </section>
+      </div><!-- End #view-ai-guide -->
+
   </div>
 
   <dialog class="receipt-review" id="receipt-review" aria-labelledby="receipt-review-title">

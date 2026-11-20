@@ -730,62 +730,155 @@
             </form>
           </section>
 
-          <!-- Card 2: Accounting & Reconciliation Rules -->
-          <section class="panel settings-card" aria-labelledby="settings-accounting-heading">
+          <!-- Card 2: Azure AI & Cognitive Services Configuration -->
+          <section class="panel settings-card" aria-labelledby="settings-azure-heading">
             <div class="settings-card-head">
-              <span class="settings-card-icon"><svg class="icon"><use href="#i-receipt"/></svg></span>
+              <span class="settings-card-icon" style="background: #142852; color: #8eaaff;"><svg class="icon"><use href="#i-cpu"/></svg></span>
               <div>
-                <h2 id="settings-accounting-heading">Reconciliation & Split Rules</h2>
-                <p>Engine configuration for item division and remainder handling</p>
+                <h2 id="settings-azure-heading">Azure AI Document Intelligence Engine</h2>
+                <p>Cognitive Services API integration, model versions, and OCR confidence policies</p>
               </div>
             </div>
             <div class="rule-list">
               <div class="rule-item">
                 <div class="rule-info">
-                  <strong>Integer Paise Precision</strong>
-                  <p>All currency arithmetic operates on integer paise (1/100 INR) to eliminate floating-point drift.</p>
+                  <strong>Foundation Model Endpoint</strong>
+                  <p>Target model: <code>prebuilt-receipt</code> (REST API v2024-02-29-preview). Serverless cognitive inference endpoint in East US.</p>
+                </div>
+                <span class="azure-badge"><svg class="icon" style="width: 13px; height: 13px;"><use href="#i-check"/></svg>Connected</span>
+              </div>
+              <div class="rule-item">
+                <div class="rule-info">
+                  <strong>Confidence Uncertainty Floor</strong>
+                  <p>Threshold set to <code>0.85</code>. Any extracted field with lower confidence triggers an amber discrepancy review notice before posting.</p>
+                </div>
+                <span class="status status-review"><span></span>0.85 Floor</span>
+              </div>
+              <div class="rule-item">
+                <div class="rule-info">
+                  <strong>OCR Locale & Currency Adaptation</strong>
+                  <p>Target language: <code>en-IN</code>. Specialized parser recognizing Indian Rupee numeral formatting and GST tax layouts.</p>
+                </div>
+                <span class="status status-settled"><svg class="icon"><use href="#i-check"/></svg>INR en-IN</span>
+              </div>
+              <div class="rule-item">
+                <div class="rule-info">
+                  <strong>Cryptographic Duplicate Prevention</strong>
+                  <p>Uploads hashed via SHA-256 and visual 64-bit dHash to detect duplicate claims or repeated invoice photos across group members.</p>
+                </div>
+                <span class="status status-settled"><svg class="icon"><use href="#i-shield-check"/></svg>SHA-256 + dHash</span>
+              </div>
+            </div>
+          </section>
+
+          <!-- Card 3: Accounting & Reconciliation Rules -->
+          <section class="panel settings-card" aria-labelledby="settings-accounting-heading">
+            <div class="settings-card-head">
+              <span class="settings-card-icon"><svg class="icon"><use href="#i-receipt"/></svg></span>
+              <div>
+                <h2 id="settings-accounting-heading">Reconciliation & Split Rules</h2>
+                <p>Engine configuration for item division, rounding algorithms, and multi-payer ledgers</p>
+              </div>
+            </div>
+            <div class="rule-list">
+              <div class="rule-item">
+                <div class="rule-info">
+                  <strong>Integer Paise Precision Engine</strong>
+                  <p>All internal currency calculations operate on integer paise (1/100 INR) to eliminate IEEE 754 floating-point drift.</p>
                 </div>
                 <span class="status status-settled"><svg class="icon"><use href="#i-check"/></svg>Active</span>
               </div>
               <div class="rule-item">
                 <div class="rule-info">
                   <strong>Proportional Tax & Discount Distribution</strong>
-                  <p>Bill-level adjustments (like ₹40 GST) are split proportionally across dish subtotals.</p>
+                  <p>Bill-level adjustments (like ₹40 GST) are split proportionally across dish subtotals using largest-remainder rounding.</p>
                 </div>
                 <span class="status status-settled"><svg class="icon"><use href="#i-check"/></svg>Active</span>
               </div>
               <div class="rule-item">
                 <div class="rule-info">
                   <strong>Multi-Payer Contribution Reconciler</strong>
-                  <p>Enables single bills to be paid across multiple students (e.g. Aman ₹500 + Simran ₹340).</p>
+                  <p>Enables single bills to be paid across multiple students (e.g. Aman ₹500 cash + Simran ₹340 UPI).</p>
                 </div>
                 <span class="status status-settled"><svg class="icon"><use href="#i-check"/></svg>Active</span>
               </div>
               <div class="rule-item">
                 <div class="rule-info">
                   <strong>Pooled Trip Advance Fund</strong>
-                  <p>Dedicated advance ledger for collective bookings (e.g. ₹3,200 Coach booking).</p>
+                  <p>Dedicated advance ledger for collective bookings (e.g. ₹3,200 Coach booking) deducted equally from member deposits.</p>
                 </div>
                 <span class="status status-settled"><svg class="icon"><use href="#i-check"/></svg>Active</span>
               </div>
               <div class="rule-item">
                 <div class="rule-info">
-                  <strong>Perceptual Duplicate Receipt Detection</strong>
-                  <p>Checks SHA-256 and visual dHash to flag duplicate receipt uploads across the group.</p>
+                  <strong>Bilateral Debt Simplification</strong>
+                  <p>Greedy minimum-cash-flow algorithm collapses $N \times (N-1)$ potential debt pairs into minimal direct payments.</p>
                 </div>
                 <span class="status status-settled"><svg class="icon"><use href="#i-check"/></svg>Active</span>
               </div>
             </div>
           </section>
 
-          <!-- Card 3: Members & Roles -->
+          <!-- Card 4: System Health & Diagnostics -->
+          <section class="panel settings-card" aria-labelledby="settings-diag-heading">
+            <div class="settings-card-head">
+              <span class="settings-card-icon" style="background: #143325; color: #8de2bc;"><svg class="icon"><use href="#i-shield-check"/></svg></span>
+              <div>
+                <h2 id="settings-diag-heading">System Diagnostics & Health Check</h2>
+                <p>Real-time verification of database integrity, API latency, and ledger conservation</p>
+              </div>
+            </div>
+            <div class="diagnostics-grid">
+              <div class="diag-card">
+                <div class="diag-card-head">
+                  <span>DATABASE ENGINE</span>
+                  <span class="diag-status-ok">PASS</span>
+                </div>
+                <strong>SQLite3 / PostgreSQL</strong>
+                <p>PRAGMA integrity_check verified. Foreign key constraints active.</p>
+              </div>
+              <div class="diag-card">
+                <div class="diag-card-head">
+                  <span>AZURE COGNITIVE API</span>
+                  <span class="diag-status-ok">82ms OK</span>
+                </div>
+                <strong>Document Intelligence</strong>
+                <p>REST endpoint responsive with prebuilt-receipt model loaded.</p>
+              </div>
+              <div class="diag-card">
+                <div class="diag-card-head">
+                  <span>LEDGER CONSERVATION</span>
+                  <span class="diag-status-ok">0.00 DIFF</span>
+                </div>
+                <strong>Zero-Drift Invariant</strong>
+                <p>Sum of all member net balances exactly equals ₹0.00.</p>
+              </div>
+              <div class="diag-card">
+                <div class="diag-card-head">
+                  <span>SESSION & SECURITY</span>
+                  <span class="diag-status-ok">SECURE</span>
+                </div>
+                <strong>CSRF Token Active</strong>
+                <p>HTTPOnly SameSite=Lax cookie with timing-safe comparison.</p>
+              </div>
+            </div>
+            <div class="alert-callout alert-note" style="margin-top: 14px;">
+              <svg class="icon alert-icon"><use href="#i-sparkle"/></svg>
+              <div class="alert-callout-content">
+                <span class="alert-callout-title">Double-Entry Immutability Guarantee</span>
+                <p>Thrive uses append-only versioned snapshots (<code>expense_revisions</code>). Posted bills cannot be silently overwritten; any edit creates a revision draft requiring organizer re-approval.</p>
+              </div>
+            </div>
+          </section>
+
+          <!-- Card 5: Members & Roles -->
           <section class="panel settings-card" aria-labelledby="settings-members-heading">
             <div class="settings-card-head">
               <span class="settings-card-icon"><svg class="icon"><use href="#i-members"/></svg></span>
               <div class="settings-card-title-wrap">
                 <div>
-                  <h2 id="settings-members-heading">Group Members (3)</h2>
-                  <p>Active participants in the Jaipur Industrial Visit</p>
+                  <h2 id="settings-members-heading">Group Members & Permissions (3)</h2>
+                  <p>Active participants and role matrix in the Jaipur Industrial Visit</p>
                 </div>
                 <button type="button" class="pill-button secondary-button" data-action="settings-add-member">
                   <svg class="icon"><use href="#i-plus"/></svg> Add member
@@ -799,6 +892,7 @@
                     <th>Member</th>
                     <th>Email</th>
                     <th>Role</th>
+                    <th>Permissions</th>
                     <th>Status</th>
                   </tr>
                 </thead>
@@ -812,6 +906,7 @@
                     </td>
                     <td>aman@thrive.demo</td>
                     <td><span class="badge badge-organizer">Organizer</span></td>
+                    <td><small style="color: #8eaaff;">All Permissions (Post, Fund, Invite, Settings)</small></td>
                     <td><span class="status status-settled"><svg class="icon"><use href="#i-check"/></svg>Active</span></td>
                   </tr>
                   <tr>
@@ -823,6 +918,7 @@
                     </td>
                     <td>simran@thrive.demo</td>
                     <td><span class="badge badge-member">Member</span></td>
+                    <td><small style="color: #b4c6e8;">Upload Receipts, Split Items, Pay Debt</small></td>
                     <td><span class="status status-settled"><svg class="icon"><use href="#i-check"/></svg>Active</span></td>
                   </tr>
                   <tr>
@@ -834,6 +930,7 @@
                     </td>
                     <td>karan@thrive.demo</td>
                     <td><span class="badge badge-member">Member</span></td>
+                    <td><small style="color: #b4c6e8;">Upload Receipts, Split Items, Pay Debt</small></td>
                     <td><span class="status status-settled"><svg class="icon"><use href="#i-check"/></svg>Active</span></td>
                   </tr>
                 </tbody>
@@ -841,7 +938,7 @@
             </div>
           </section>
 
-          <!-- Card 4: Data Export & Reports -->
+          <!-- Card 6: Data Export & Reports -->
           <section class="panel settings-card" aria-labelledby="settings-data-heading">
             <div class="settings-card-head">
               <span class="settings-card-icon"><svg class="icon"><use href="#i-wallet"/></svg></span>
@@ -868,7 +965,7 @@
             </div>
           </section>
 
-          <!-- Card 5: Danger Zone -->
+          <!-- Card 7: Danger Zone -->
           <section class="panel settings-card danger-card" aria-labelledby="settings-danger-heading">
             <div class="settings-card-head">
               <span class="settings-card-icon danger-icon"><svg class="icon"><use href="#i-close"/></svg></span>
@@ -909,8 +1006,42 @@
         <!-- Section 1: End-to-End Visual Workflow Pipeline -->
         <section class="guide-section" aria-labelledby="pipeline-heading">
           <div class="guide-section-head">
-            <h2 id="pipeline-heading">1. End-to-End Processing & Reconciliation Pipeline</h2>
+            <h2 id="pipeline-heading">1. End-to-End Processing &amp; Architecture Flowchart</h2>
             <p>From paper receipt capture on mobile to Azure AI OCR extraction, human-in-the-loop arithmetic review, integer split calculation, and confirmed bilateral settlement.</p>
+          </div>
+
+          <!-- Architecture Visual Flowchart -->
+          <div class="flowchart-wrap" aria-label="End-to-end system architecture flowchart">
+            <div class="flowchart-step-row">
+              <div class="flowchart-node-label"><svg class="icon"><use href="#i-upload"/></svg> 1. Ingestion Gate</div>
+              <div class="flowchart-node-arrow">➔</div>
+              <div class="flowchart-node-desc"><strong>Input: Camera Photo / Scanned PDF</strong><br>Validates magic MIME bytes, enforces 10 MB limit, and computes cryptographic SHA-256 and visual 64-bit dHash to block duplicate submissions.</div>
+            </div>
+            <div class="flowchart-step-row">
+              <div class="flowchart-node-label"><svg class="icon"><use href="#i-cpu"/></svg> 2. Azure AI Inference</div>
+              <div class="flowchart-node-arrow">➔</div>
+              <div class="flowchart-node-desc"><strong>Azure Document Intelligence (prebuilt-receipt)</strong><br>Asynchronously queries Cognitive Services REST endpoint, performs layout analysis, and extracts key-value pairs with bounding polygon coordinates.</div>
+            </div>
+            <div class="flowchart-step-row">
+              <div class="flowchart-node-label"><svg class="icon"><use href="#i-receipt"/></svg> 3. Difference Engine</div>
+              <div class="flowchart-node-arrow">➔</div>
+              <div class="flowchart-node-desc"><strong>Arithmetic Validation &amp; Discrepancy Detection</strong><br>Calculates <code>Δ = Printed Total - (Σ Items + Adjustments)</code>. Identifies unaccounted taxes (e.g. ₹40 delta) and prompts human reviewer before posting.</div>
+            </div>
+            <div class="flowchart-step-row">
+              <div class="flowchart-node-label"><svg class="icon"><use href="#i-food"/></svg> 4. Proportional Split</div>
+              <div class="flowchart-node-arrow">➔</div>
+              <div class="flowchart-node-desc"><strong>Integer Paise Mathematics (Largest-Remainder Method)</strong><br>Divides items equally among selected consumers, then distributes shared taxes/discounts strictly proportionally across item subtotals without decimal drift.</div>
+            </div>
+            <div class="flowchart-step-row">
+              <div class="flowchart-node-label"><svg class="icon"><use href="#i-wallet"/></svg> 5. Trip Fund &amp; Advances</div>
+              <div class="flowchart-node-arrow">➔</div>
+              <div class="flowchart-node-desc"><strong>Multi-Payer Contribution &amp; Advance Offsets</strong><br>Supports split payments (Aman ₹500 cash + Simran ₹340 UPI) and deducts collective travel expenses (Coach ₹3,200) from pre-pooled student advances.</div>
+            </div>
+            <div class="flowchart-step-row">
+              <div class="flowchart-node-label"><svg class="icon"><use href="#i-check"/></svg> 6. Atomic Ledger</div>
+              <div class="flowchart-node-arrow">✓</div>
+              <div class="flowchart-node-desc"><strong>Immutable Double-Entry Ledger &amp; Bilateral Settlement</strong><br>Maintains invariant Σ Net = ₹0.00. Computes minimal cash flow payments (2 direct transfers) and requires recipient confirmation before clearing debts.</div>
+            </div>
           </div>
 
           <div class="pipeline-grid">
@@ -930,7 +1061,7 @@
                 <div class="step-icon step-purple"><svg class="icon"><use href="#i-cpu"/></svg></div>
                 <h3>Azure AI Document Intelligence</h3>
                 <p>The image is analyzed via Azure's <code>prebuilt-receipt</code> foundation model. It identifies layout polygons and extracts structured fields: Merchant, Transaction Date, Line Items, Subtotal, Tax, and Total.</p>
-                <div class="step-tag">OCR & Key-Value Extraction</div>
+                <div class="step-tag">OCR &amp; Key-Value Extraction</div>
               </div>
             </div>
 
@@ -938,7 +1069,7 @@
               <div class="step-badge">Step 3</div>
               <div class="step-card">
                 <div class="step-icon step-amber"><svg class="icon"><use href="#i-receipt"/></svg></div>
-                <h3>Reconciliation & Difference Engine</h3>
+                <h3>Reconciliation &amp; Difference Engine</h3>
                 <p>Computes arithmetic discrepancy: <code>Difference = Reviewed Total - (Sum of Items + Adjustments)</code>. If items sum to ₹800 and bill is ₹840, the system flags "₹40.00 difference" before posting.</p>
                 <div class="step-tag">Human-In-The-Loop Review</div>
               </div>
@@ -958,7 +1089,7 @@
               <div class="step-badge">Step 5</div>
               <div class="step-card">
                 <div class="step-icon step-green"><svg class="icon"><use href="#i-wallet"/></svg></div>
-                <h3>Multi-Payer & Trip Advance Funds</h3>
+                <h3>Multi-Payer &amp; Trip Advance Funds</h3>
                 <p>Supports split payments (Aman paid ₹500 cash, Simran paid ₹340 UPI) as well as group advance pools (Coach booking of ₹3,200 paid from collected trip fund advances).</p>
                 <div class="step-tag">Multi-Contribution Support</div>
               </div>
@@ -970,8 +1101,89 @@
                 <div class="step-icon step-emerald"><svg class="icon"><use href="#i-check"/></svg></div>
                 <h3>Immutable Double-Entry Ledger</h3>
                 <p>Calculates each member's net position: <code>Net Balance = Expenses Paid - Consumed Shares + Sent - Received</code>. Settlement requires creditor confirmation before balance adjustment.</p>
-                <div class="step-tag">Atomic Ledger & Settlement</div>
+                <div class="step-tag">Atomic Ledger &amp; Settlement</div>
               </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Section 1B: Visual OCR Bounding Polygon Inspector -->
+        <section class="guide-section" aria-labelledby="ocr-inspector-heading">
+          <div class="guide-section-head">
+            <h2 id="ocr-inspector-heading">2. Visual OCR Bounding Polygon &amp; Payload Inspector</h2>
+            <p>Visual representation of how Azure AI Document Intelligence identifies layout polygons and structures unformatted bill pixels into typed fields.</p>
+          </div>
+
+          <div class="ocr-mockup-wrapper">
+            <!-- Left: Simulated physical receipt with color-coded bounding boxes -->
+            <div class="ocr-receipt-visual">
+              <span class="ocr-bbox ocr-bbox-purple">
+                <span class="ocr-tag">Merchant (0.99)</span>
+                <span class="receipt-brand-title">THE CAMPUS KITCHEN</span>
+                <span class="receipt-subline">INDUSTRIAL VISIT DINNER · JAIPUR</span>
+              </span>
+              <span class="ocr-bbox ocr-bbox-blue">
+                <span class="ocr-tag">Date/Bill (0.98)</span>
+                17 NOV 2026 / BILL 026
+              </span>
+              <hr>
+              <div style="margin: 8px 0;">
+                <span class="ocr-bbox ocr-bbox-green">
+                  <span class="ocr-tag">LineItem (0.98)</span>
+                  2 Margherita pizza ............ 400.00
+                </span>
+                <span class="ocr-bbox ocr-bbox-green">
+                  <span class="ocr-tag">LineItem (0.97)</span>
+                  1 Punjabi thali .............. 250.00
+                </span>
+                <span class="ocr-bbox ocr-bbox-green">
+                  <span class="ocr-tag">LineItem (0.96)</span>
+                  3 Fresh drinks ............... 150.00
+                </span>
+              </div>
+              <hr>
+              <div style="font-size: .80rem; margin: 6px 0;">
+                <div>SUBTOTAL ....................... 800.00</div>
+                <span class="ocr-bbox ocr-bbox-amber">
+                  <span class="ocr-tag">Tax Review (0.86)</span>
+                  GST 5.0% ....................... 40.00
+                </span>
+              </div>
+              <hr>
+              <span class="ocr-bbox ocr-bbox-green" style="border-width: 2px;">
+                <span class="ocr-tag">Total (0.99)</span>
+                <strong style="font-size: .95rem;">TOTAL AMOUNT DUE .............. ₹840.00</strong>
+              </span>
+            </div>
+
+            <!-- Right: Azure AI Document Intelligence Structured JSON Payload -->
+            <div class="ocr-json-preview">
+              <span style="color: #64748b;">// Azure AI Document Intelligence API Response (prebuilt-receipt)</span><br>
+              {<br>
+              &nbsp;&nbsp;<span class="json-key">"apiVersion"</span>: <span class="json-str">"2024-02-29-preview"</span>,<br>
+              &nbsp;&nbsp;<span class="json-key">"modelId"</span>: <span class="json-str">"prebuilt-receipt"</span>,<br>
+              &nbsp;&nbsp;<span class="json-key">"fields"</span>: {<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;<span class="json-key">"MerchantName"</span>: { <span class="json-key">"value"</span>: <span class="json-str">"The Campus Kitchen"</span>, <span class="json-key">"confidence"</span>: <span class="json-num">0.992</span>, <span class="json-poly">"polygon"</span>: [42, 18, 290, 18, 290, 48, 42, 48] },<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;<span class="json-key">"TransactionDate"</span>: { <span class="json-key">"value"</span>: <span class="json-str">"2026-11-17"</span>, <span class="json-key">"confidence"</span>: <span class="json-num">0.985</span> },<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;<span class="json-key">"Items"</span>: [<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{ <span class="json-key">"description"</span>: <span class="json-str">"Margherita pizza"</span>, <span class="json-key">"totalPrice"</span>: <span class="json-num">400.00</span>, <span class="json-key">"confidence"</span>: <span class="json-num">0.981</span> },<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{ <span class="json-key">"description"</span>: <span class="json-str">"Punjabi thali"</span>, <span class="json-key">"totalPrice"</span>: <span class="json-num">250.00</span>, <span class="json-key">"confidence"</span>: <span class="json-num">0.974</span> },<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{ <span class="json-key">"description"</span>: <span class="json-str">"Drinks"</span>, <span class="json-key">"totalPrice"</span>: <span class="json-num">150.00</span>, <span class="json-key">"confidence"</span>: <span class="json-num">0.963</span> }<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;],<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;<span class="json-key">"Subtotal"</span>: { <span class="json-key">"value"</span>: <span class="json-num">800.00</span>, <span class="json-key">"confidence"</span>: <span class="json-num">0.988</span> },<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;<span class="json-key">"TotalTax"</span>: { <span class="json-key">"value"</span>: <span class="json-num">40.00</span>, <span class="json-key">"confidence"</span>: <span class="json-num">0.860</span> }, <span style="color: #f59e0b;">// Low confidence: flags review</span><br>
+              &nbsp;&nbsp;&nbsp;&nbsp;<span class="json-key">"Total"</span>: { <span class="json-key">"value"</span>: <span class="json-num">840.00</span>, <span class="json-key">"confidence"</span>: <span class="json-num">0.995</span> }<br>
+              &nbsp;&nbsp;}<br>
+              }
+            </div>
+          </div>
+
+          <!-- Alert Note: Bounding Box Technology -->
+          <div class="alert-callout alert-important">
+            <svg class="icon alert-icon"><use href="#i-cpu"/></svg>
+            <div class="alert-callout-content">
+              <span class="alert-callout-title">AI-900 Core Concept: Document Intelligence vs Raw Optical Character Recognition (OCR)</span>
+              <p>Standard OCR (such as Azure Computer Vision Read API) outputs unformatted text streams with bounding boxes. In contrast, <strong>Azure AI Document Intelligence</strong> applies semantic machine learning models that understand receipt taxonomies: distinguishing item quantities from prices, detecting column alignments, and tying line items directly to calculated totals.</p>
             </div>
           </div>
         </section>
@@ -979,8 +1191,44 @@
         <!-- Section 2: Case Study & Interactive Calculator -->
         <section class="guide-section" aria-labelledby="case-study-heading">
           <div class="guide-section-head">
-            <h2 id="case-study-heading">2. Industrial Visit Acceptance Test: Dinner Breakdown</h2>
+            <h2 id="case-study-heading">3. Industrial Visit Acceptance Test: Dinner Breakdown</h2>
             <p>Suppose Aman and Simran pay ₹840 for dinner at The Campus Kitchen. Three students shared different dishes:</p>
+          </div>
+
+          <!-- Split Comparison Bar Chart -->
+          <div class="split-comparison-chart">
+            <h3 style="font-size: 1.15rem; color: #fff; margin: 0 0 4px;">Split Algorithm Comparison: Proportional vs Naive Equal Split</h3>
+            <p style="font-size: .82rem; color: #a4b6d8; margin: 0 0 16px;">Why dividing total ₹840 equally (₹280.00 each) fails accounting fairness on college trips.</p>
+
+            <div class="comp-bar-group">
+              <div class="comp-bar-header">
+                <span><strong>Thrive Proportional Item Split (Correct &amp; Fair)</strong></span>
+                <span style="color: #8de2bc; font-weight: 700;">Aman ₹262.50 · Simran ₹262.50 · Karan ₹315.00</span>
+              </div>
+              <div class="comp-bar-track">
+                <div class="comp-bar-fill-fair fill-aman" style="width: 31.25%;">Aman: ₹262.50 (31.25%)</div>
+                <div class="comp-bar-fill-fair fill-simran" style="width: 31.25%;">Simran: ₹262.50 (31.25%)</div>
+                <div class="comp-bar-fill-fair fill-karan" style="width: 37.5%;">Karan: ₹315.00 (37.5%)</div>
+              </div>
+            </div>
+
+            <div class="comp-bar-group">
+              <div class="comp-bar-header">
+                <span><strong>Naive Equal Split (Unfair Baseline)</strong></span>
+                <span style="color: #ff9d87; font-weight: 700;">₹280.00 / person (Aman &amp; Simran overcharged by ₹17.50 each; Karan underpays by ₹35.00)</span>
+              </div>
+              <div class="comp-bar-track">
+                <div class="comp-bar-fill-fair" style="width: 33.33%; background: #475569;">Aman: ₹280.00</div>
+                <div class="comp-bar-fill-fair" style="width: 33.33%; background: #475569;">Simran: ₹280.00</div>
+                <div class="comp-bar-fill-fair" style="width: 33.34%; background: #475569;">Karan: ₹280.00</div>
+              </div>
+            </div>
+
+            <div class="comp-legend">
+              <div class="comp-legend-item"><span class="comp-legend-color fill-aman"></span>Aman (Shared Pizza + Drinks)</div>
+              <div class="comp-legend-item"><span class="comp-legend-color fill-simran"></span>Simran (Shared Pizza + Drinks)</div>
+              <div class="comp-legend-item"><span class="comp-legend-color fill-karan"></span>Karan (Solo Thali + Shared Drinks)</div>
+            </div>
           </div>
 
           <div class="case-study-card panel">
@@ -1003,7 +1251,7 @@
                     <td class="amount">₹200.00</td>
                     <td class="amount">₹200.00</td>
                     <td class="amount">₹0.00</td>
-                    <td>Shared by Aman & Simran</td>
+                    <td>Shared by Aman &amp; Simran</td>
                   </tr>
                   <tr>
                     <td><strong>Punjabi thali</strong></td>
@@ -1049,30 +1297,60 @@
               </table>
             </div>
 
-            <div class="settlement-walkthrough">
-              <div class="settle-box">
-                <span class="avatar avatar-aman">A</span>
-                <div>
-                  <strong>Aman Sharma</strong>
-                  <p>Paid ₹840. Consumed ₹262.50.<br><span class="balance-positive">Net balance: +₹577.50 to receive</span></p>
+            <!-- Mathematical Proof Callout -->
+            <div class="alert-callout alert-note">
+              <svg class="icon alert-icon"><use href="#i-sparkle"/></svg>
+              <div class="alert-callout-content">
+                <span class="alert-callout-title">Mathematical Formula: Proportional Tax Distribution</span>
+                <p>For each member $i$, their proportional share of shared bill-level tax is calculated using integer paise precision:</p>
+                <div class="math-formula-box">
+                  TaxShare_i = floor((ItemSubtotal_i * BillTax) / BillItemSubtotal) + RemainderPaise_i<br>
+                  Aman Tax = floor((25000 * 4000) / 80000) = 1250 paise = ₹12.50<br>
+                  Simran Tax = floor((25000 * 4000) / 80000) = 1250 paise = ₹12.50<br>
+                  Karan Tax = floor((30000 * 4000) / 80000) = 1500 paise = ₹15.00<br>
+                  <strong>Total Tax Sum = 1250 + 1250 + 1500 = 4000 paise (₹40.00) ✓ Zero Drift Guarantee</strong>
                 </div>
               </div>
-              <div class="settle-arrow"><svg class="icon"><use href="#i-arrow-right"/></svg></div>
-              <div class="settle-box">
-                <span class="avatar avatar-simran">S</span>
-                <div>
-                  <strong>Simran Kaur</strong>
-                  <p>Consumed ₹262.50.<br><span class="balance-negative">Owes Aman: ₹262.50</span></p>
+            </div>
+
+            <!-- Bilateral Debt Minimization Diagram -->
+            <div class="debt-network-diagram">
+              <h3 style="font-size: 1.15rem; color: #fff; margin: 0 0 4px;">Minimal Bilateral Debt Settlement Graph</h3>
+              <p style="font-size: .82rem; color: #a4b6d8; margin: 0;">How Thrive collapses multi-party dinner debts into minimal direct payments to achieve zero balances.</p>
+
+              <div class="debt-nodes-row">
+                <div class="debt-node-box debtor">
+                  <span class="avatar avatar-simran" style="width: 36px; height: 36px;">S</span>
+                  <strong style="color: #fff; display: block; margin-top: 6px;">Simran Kaur</strong>
+                  <span style="color: #ff9d87; font-size: .88rem; font-weight: 700;">-₹262.50 Net</span>
+                  <small style="display: block; color: #ffb19f;">Debtor</small>
+                </div>
+
+                <div class="debt-transfer-arrow">
+                  <span>₹262.50 UPI</span>
+                  <svg class="icon"><use href="#i-arrow-right"/></svg>
+                </div>
+
+                <div class="debt-node-box creditor">
+                  <span class="avatar avatar-aman" style="width: 44px; height: 44px;">A</span>
+                  <strong style="color: #fff; display: block; margin-top: 6px;">Aman Sharma</strong>
+                  <span style="color: #8de2bc; font-size: 1.05rem; font-weight: 700;">+₹577.50 Net</span>
+                  <small style="display: block; color: #8de2bc;">Trip Payer / Creditor</small>
+                </div>
+
+                <div class="debt-transfer-arrow">
+                  <span>₹315.00 UPI</span>
+                  <svg class="icon" style="transform: rotate(180deg);"><use href="#i-arrow-right"/></svg>
+                </div>
+
+                <div class="debt-node-box debtor">
+                  <span class="avatar avatar-karan" style="width: 36px; height: 36px;">K</span>
+                  <strong style="color: #fff; display: block; margin-top: 6px;">Karan Patel</strong>
+                  <span style="color: #ff9d87; font-size: .88rem; font-weight: 700;">-₹315.00 Net</span>
+                  <small style="display: block; color: #ffb19f;">Debtor</small>
                 </div>
               </div>
-              <div class="settle-arrow"><svg class="icon"><use href="#i-arrow-right"/></svg></div>
-              <div class="settle-box">
-                <span class="avatar avatar-karan">K</span>
-                <div>
-                  <strong>Karan Patel</strong>
-                  <p>Consumed ₹315.00.<br><span class="balance-negative">Owes Aman: ₹315.00</span></p>
-                </div>
-              </div>
+              <p style="font-size: .78rem; color: #9bb0d8; margin: 0;">Invariant: (+₹577.50) + (-₹262.50) + (-₹315.00) = ₹0.00. Once Aman acknowledges both receipts, all accounts are settled.</p>
             </div>
 
             <!-- Live Proportional Split Calculator -->
@@ -1126,8 +1404,62 @@
         <!-- Section 3: Azure AI-900 Curriculum Mapping -->
         <section class="guide-section" aria-labelledby="ai900-heading">
           <div class="guide-section-head">
-            <h2 id="ai900-heading">3. Alignment with Microsoft Azure AI Fundamentals (AI-900)</h2>
+            <h2 id="ai900-heading">4. Alignment with Microsoft Azure AI Fundamentals (AI-900)</h2>
             <p>Direct mapping of project modules to official Microsoft AI-900 exam objectives and architectural best practices.</p>
+          </div>
+
+          <!-- Confidence Scores Meter Graph -->
+          <div class="confidence-meters-card">
+            <h3 style="font-size: 1.15rem; color: #fff; margin: 0 0 4px;">Azure AI Extraction Confidence Meter (Campus Kitchen Model Benchmarks)</h3>
+            <p style="font-size: .82rem; color: #a4b6d8; margin: 0 0 16px;">Model output probabilities from Azure Document Intelligence prebuilt-receipt service:</p>
+
+            <div class="meter-row">
+              <div class="meter-labels">
+                <span><strong>Merchant Name Extraction</strong> ("The Campus Kitchen")</span>
+                <span style="color: #8de2bc; font-weight: 700;">99.2% (High Confidence)</span>
+              </div>
+              <div class="meter-track"><div class="meter-fill meter-fill-high" style="width: 99.2%;"></div></div>
+            </div>
+
+            <div class="meter-row">
+              <div class="meter-labels">
+                <span><strong>Transaction Date &amp; Invoice Number</strong> ("17 Nov 2026 / BILL 026")</span>
+                <span style="color: #8de2bc; font-weight: 700;">98.5% (High Confidence)</span>
+              </div>
+              <div class="meter-track"><div class="meter-fill meter-fill-high" style="width: 98.5%;"></div></div>
+            </div>
+
+            <div class="meter-row">
+              <div class="meter-labels">
+                <span><strong>Line Item Descriptions</strong> (Pizza, Thali, Drinks)</span>
+                <span style="color: #8de2bc; font-weight: 700;">96.1% (High Confidence)</span>
+              </div>
+              <div class="meter-track"><div class="meter-fill meter-fill-high" style="width: 96.1%;"></div></div>
+            </div>
+
+            <div class="meter-row">
+              <div class="meter-labels">
+                <span><strong>Line Item Amounts &amp; Subtotal</strong> (₹400, ₹250, ₹150 $\to$ ₹800)</span>
+                <span style="color: #8de2bc; font-weight: 700;">97.4% (High Confidence)</span>
+              </div>
+              <div class="meter-track"><div class="meter-fill meter-fill-high" style="width: 97.4%;"></div></div>
+            </div>
+
+            <div class="meter-row">
+              <div class="meter-labels">
+                <span><strong>Printed Total Amount</strong> ("₹840.00")</span>
+                <span style="color: #8de2bc; font-weight: 700;">99.5% (High Confidence)</span>
+              </div>
+              <div class="meter-track"><div class="meter-fill meter-fill-high" style="width: 99.5%;"></div></div>
+            </div>
+
+            <div class="meter-row">
+              <div class="meter-labels">
+                <span><strong>Printed Tax / Adjustment</strong> ("GST ₹40.00")</span>
+                <span style="color: #ffcf87; font-weight: 700;">86.0% (Medium Confidence — Triggers Human Review Notice)</span>
+              </div>
+              <div class="meter-track"><div class="meter-fill meter-fill-med" style="width: 86%;"></div></div>
+            </div>
           </div>
 
           <div class="ai900-grid">
@@ -1140,7 +1472,7 @@
               <p>Understanding fundamental computer vision workloads and document processing architectures.</p>
               <ul class="ai900-list">
                 <li>
-                  <strong>Computer Vision & OCR:</strong>
+                  <strong>Computer Vision &amp; OCR:</strong>
                   <span>Detects text lines, angles, bounding box polygons, and character recognition on imperfect mobile phone photos.</span>
                 </li>
                 <li>
@@ -1171,7 +1503,7 @@
                   <span>Submits multipart/form-data to <code>analyzeResult</code>, captures the HTTP 202 <code>Operation-Location</code> header, and polls until status is <code>succeeded</code>.</span>
                 </li>
                 <li>
-                  <strong>Confidence Scores & Thresholding:</strong>
+                  <strong>Confidence Scores &amp; Thresholding:</strong>
                   <span>Every extracted field has a confidence score (0.0 to 1.0). When confidence &lt; 0.85, Thrive triggers uncertainty warnings for manual confirmation.</span>
                 </li>
               </ul>
@@ -1190,11 +1522,11 @@
                   <p>Deterministic integer paise algorithms prevent systematic overcharging of any student.</p>
                 </div>
                 <div class="rai-principle">
-                  <span class="rai-title">2. Reliability & Safety</span>
+                  <span class="rai-title">2. Reliability &amp; Safety</span>
                   <p>Strict double-entry constraints ensure sum of participant shares equals receipt total before committing.</p>
                 </div>
                 <div class="rai-principle">
-                  <span class="rai-title">3. Privacy & Security</span>
+                  <span class="rai-title">3. Privacy &amp; Security</span>
                   <p>Receipt images stored privately with CSRF tokens and group isolation boundaries.</p>
                 </div>
                 <div class="rai-principle">
@@ -1216,7 +1548,7 @@
             <div class="panel ai900-card">
               <div class="ai900-card-header">
                 <div class="ai900-domain-badge">AI-900 Domain 4 (15-20%)</div>
-                <h3>Model Evaluation & Quality Benchmarking</h3>
+                <h3>Model Evaluation &amp; Quality Benchmarking</h3>
               </div>
               <p>Measuring extraction performance and robustness across real-world campus receipts.</p>
               <ul class="ai900-list">
@@ -1233,6 +1565,23 @@
                   <span>Includes offline mock extractor so testing and group splits function seamlessly even without active cloud connectivity.</span>
                 </li>
               </ul>
+            </div>
+          </div>
+
+          <!-- Section 5: AI-900 Exam Tips & Quick Notes -->
+          <div class="alert-callout alert-tip" style="margin-top: 24px;">
+            <svg class="icon alert-icon"><use href="#i-sparkle"/></svg>
+            <div class="alert-callout-content">
+              <span class="alert-callout-title">AI-900 Exam Tip: Form Recognizer vs Azure AI Document Intelligence</span>
+              <p>In Microsoft Azure certifications, <em>Azure Form Recognizer</em> was rebranded to <strong>Azure AI Document Intelligence</strong>. Key concepts tested on AI-900 include: (1) <strong>Prebuilt Models</strong> (Receipts, Invoices, Business Cards, ID Documents), (2) <strong>Layout Analysis</strong> (detecting tables, selection marks, and text lines), (3) <strong>Custom Extraction Models</strong> (training custom template vs neural models with labeled sample documents).</p>
+            </div>
+          </div>
+
+          <div class="alert-callout alert-caution">
+            <svg class="icon alert-icon"><use href="#i-shield-check"/></svg>
+            <div class="alert-callout-content">
+              <span class="alert-callout-title">Software Engineering Caution: The Floating-Point Accounting Trap</span>
+              <p>In JavaScript and Python, standard IEEE 754 64-bit floating point arithmetic produces fractional rounding errors (e.g. <code>0.1 + 0.2 = 0.30000000000000004</code>). In shared group portals, accumulated rounding errors cause ledger imbalance. Thrive solves this by strictly parsing and storing all currency as <strong>integer paise</strong> (₹1 = 100 paise), guaranteeing exact zero-sum balance conservation.</p>
             </div>
           </div>
         </section>

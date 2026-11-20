@@ -15,6 +15,12 @@ Open [Thrive on localhost](http://127.0.0.1:5050) for the Jaipur Industrial Visi
 
 The [ledger workspace](http://127.0.0.1:5050/workspace) opens as Aman Sharma in demo mode and uses fictional data in `instance/demo`. Run `python app.py` for a separate workspace with account registration. Use `--port 5051` if port 5050 is taken.
 
+## Deploy on Render
+
+The root `render.yaml` defines a Render Blueprint for the Flask app. In Render, choose **New + → Blueprint**, connect this GitHub repository, and deploy the Blueprint. It configures a Singapore web service with HTTPS cookies, a generated session secret, a single receipt worker, and a persistent disk for the SQLite database and uploaded receipts. The disk and web service use paid Render resources.
+
+To enable Azure receipt scanning, set `DOCUMENTINTELLIGENCE_ENDPOINT` and `DOCUMENTINTELLIGENCE_API_KEY` in the Render service's environment. Without them, users can still enter receipt details manually.
+
 ### Opening view artwork
 
 The built-in ImageGen tool created the fictional member portraits in `static/jaipur/member-portraits.png`.

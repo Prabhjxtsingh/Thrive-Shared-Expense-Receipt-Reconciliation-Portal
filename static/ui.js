@@ -62,7 +62,7 @@ export const pill = (label, tone = "gray", symbol = "") => `<span class="pill ${
 export const btn = (label, action, { symbol = "", type = "", attrs = "" } = {}) =>
   `<button type="button" class="button ${type}" data-action="${action}" ${attrs}>${symbol ? icon(symbol, true) : ""}${esc(label)}</button>`;
 export const linkButton = (label, href) => `<a class="text-button" href="${href}">${esc(label)}</a>`;
-export const brand = () => `<a class="brand" href="#overview"><span class="logo">${icon("logo")}</span>Thrive</a>`;
+export const brand = () => `<a class="brand" href="/" aria-label="Thrive Home"><span class="logo">${icon("logo")}</span>Thrive</a>`;
 export const empty = (title, description, symbol = "receipt", action = "") =>
   `<div class="empty">${tile(symbol)}<strong>${esc(title)}</strong><p>${esc(description)}</p>${action}</div>`;
 export const cardHead = (title, description = "", action = "") =>
